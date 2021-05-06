@@ -2,7 +2,7 @@
 # Make Box label for start window
 # Give instructions
 # Make box for users to enter how many number of questions they want
-# Check user input
+# Check user input (validate user entry as number)
 # Make button (easy only for testing purposes) to give comment on another / separate window
 
 from tkinter import *
@@ -20,8 +20,19 @@ class Start:
                                        font="Arial 19 bold")
         self.guess_note_label.grid(row=1)
 
+
+
+
+
         # Entry box... (row 1)
         self.start_number_entry = Entry(self.start_frame, font="Arial 16 bold")
+        Convert_to_int = int(Entry.get())
+
+
+
+
+
+
 
         if self.start_number_entry >= 50:
             print("Sorry enter between 10 - 50 for testing purposes")
