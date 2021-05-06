@@ -1,3 +1,10 @@
+# To do list:
+# Make Box label for start window
+# Give instructions
+# Make box for users to enter how many number of questions they want
+# Check user input
+# Make button (easy only for testing purposes) to give comment on another / separate window
+
 from tkinter import *
 from functools import partial    # To prevent unwanted windows
 import random
@@ -15,6 +22,12 @@ class Start:
 
         # Entry box... (row 1)
         self.start_number_entry = Entry(self.start_frame, font="Arial 16 bold")
+
+        if self.start_number_entry >= 50:
+            print("Sorry enter between 10 - 50 for testing purposes")
+
+        else:
+            print("Okay! {} questions :)".format(self.start_number_entry))
 
         self.start_number_entry.grid(row=2)
 
@@ -46,7 +59,7 @@ class Quiz:
         self.quiz_frame.grid()
 
         # Heading Row
-        self.heading_label = Label(self.quiz_frame, text="Quesiton",
+        self.heading_label = Label(self.quiz_frame, text="Question",
                                    font="Arial 24 bold", padx=10,
                                    pady=10)
         self.heading_label.grid(row=0)
@@ -58,23 +71,12 @@ class Quiz:
         self.question_label = Label(self.quiz_frame, text="Question...")
         self.question_label.grid(row=2)
 
-        self.play_button = Button(self.quiz_frame, text="Next",
-                                  padx=10, pady=10, command=self.generate_questions)
-        self.play_button.grid(row=3)
+        self.next_button = Button(self.quiz_frame, text="Next",
+                                  padx=10, pady=10, command=self.level_up)
+        self.next_button.grid(row=3)
 
-    def generate_questions(self):
-        # retrieve the question from the initial function...
-        level = self.question.get()
 
-        # Adjust the question (subtract quiz cost and add pay out)
-        # For testing purposes, just add 2
-        level += 1
 
-        # Set question to adjusted question
-        self.question.set(level)
-
-        # Edit label so user can see their question
-        self.question_label.configure(text="Question #: {}".format(level))
 
 # main routine
 if __name__ == "__main__":
