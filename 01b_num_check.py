@@ -1,47 +1,48 @@
-# Make sure that number is between 10 to 50 for testing purposes
+# Reference: https://www.youtube.com/watch?v=IbpInH4q4Sg
+# Reference 2: https://www.geeksforgeeks.org/python-tkinter-spinbox-range-validation/
 
-def num_check(low):
-    valid = False
-    while not valid:
-        try:
-            response = float(input("Enter a number: "))
+from tkinter import *
+import tkinter
 
-            # Print error message if number is below 10 or above 50
-            if response < 10:
-                print("Please enter a number between 10 to 50")
+root = Tk()
+root.title("Guess the Note")
+root.geometry("400x400")
 
-            elif response > 50:
-                print("Please enter a number between 10 to 50")
 
-            else:
-                return response
+# A function that checks if the user input is an integer
+def int_check():
+    try:
+        int(total_questions.get())
 
-        except ValueError:
-            print("Please enter a number")
+        # Check if user input is between 10 and 50
+        if int(total_questions.get()) not in range(10, 50):
+            answer.config(text="Out of range. Please enter an integer between 10 and 50")
+            return False
 
-# Main routine
-def __init__(self, parent):
-    # GUI to get starting question and mode
-    self.start_frame = Frame(padx=10, pady=10)
-    self.start_frame.grid()
+        else:
+            answer.config(text="Okay!")
+            return True
 
-    # Mystery Heading (row 0)
-    self.guess_note_label = Label(self.start_frame, text="Guess the Note",
-                                  font="Arial 19 bold")
-    self.guess_note_label.grid(row=1)
+    # Give error message if user input is not an integer between 10 and 50
+    except ValueError:
+        answer.config(text="Sorry please enter an integer between 10 and 50")
 
-    # Entry box... (row 1)
-    self.start_number_entry = Entry(self.start_frame, font="Arial 16 bold")
 
-    if self.start_number_entry >= 50:
-        print("Sorry enter between 10 - 50 for testing purposes")
+# Give simple instructions to the user
+instruction = Label(root, text="Enter a number between 10 and 50")
+instruction.pack(pady=20)
 
-    else:
-        print("Okay! {} questions :)".format(self.start_number_entry))
+# Allow user to input the number of questions they want
+total_questions = Entry(root)
+total_questions.pack(pady=10)
 
-    self.start_number_entry.grid(row=2)
+# Make button to click to next question
+next_button = Button(root, text="Next", command=int_check)
+next_button.pack(pady=5)
 
-    # Play Button (row 2)
-    self.easymode_button = Button(text="Easy",
-                                  command=lambda: self.to_quiz(1))
-    self.easymode_button.grid(row=2, pady=10)
+answer = Label(root, text='')
+answer.pack(pady=20)
+
+root.mainloop
+
+# Make sure that 000 & any number that begins with 0 is an invalid input
