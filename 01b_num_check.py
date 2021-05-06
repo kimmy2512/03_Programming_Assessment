@@ -1,8 +1,10 @@
-# Reference: https://www.youtube.com/watch?v=IbpInH4q4Sg
-# Reference 2: https://www.geeksforgeeks.org/python-tkinter-spinbox-range-validation/
+# Create Help button
+# Add in images
+# Make exit button
 
 from tkinter import *
 import tkinter
+from functools import partial  # To prevent unwanted windows
 
 root = Tk()
 root.title("Guess the Note")
@@ -43,6 +45,5 @@ next_button.pack(pady=5)
 answer = Label(root, text='')
 answer.pack(pady=20)
 
-root.mainloop
 
-# Make sure that 000 & any number that begins with 0 is an invalid input
+root.mainloop
