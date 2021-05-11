@@ -4,7 +4,6 @@
 
 from tkinter import *
 import tkinter
-from functools import partial  # To prevent unwanted windows
 
 root = Tk()
 root.title("Guess the Note")
@@ -44,6 +43,5 @@ next_button.pack(pady=5)
 
 answer = Label(root, text='')
 answer.pack(pady=20)
-
 
 root.mainloop
