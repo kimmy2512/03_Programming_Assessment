@@ -1,8 +1,7 @@
 # To Do list: 
 # Make classes and rearrange mainloop function
 # Create Learn function (new tab with suitable buttons like dimiss button)
-# Add in images
-# Make exit button
+# Add in images for learn window
 
 from tkinter import *
 from functools import partial    # To prevent unwanted windows
@@ -69,7 +68,7 @@ class Learn:
   def __init__(self, partner):
 
     # Disable learn button
-    self.learn_button.config(state=DISABLED)
+    partner.learn_button.config(state=DISABLED)
 
     # Sets up child window (ie: learn box)
     self.learn_box = Toplevel()
@@ -96,9 +95,9 @@ class Learn:
 
     # Dismiss button (row 2)
     self.dismiss_btn = Button(self.learn_frame, text="Dismiss",
-                              width=10, bg="#660000", fg="white",
-                              font="Arial 15 bold", command=partial(self.close_learn, partner))
-    self.dismiss_btn.grid(row=3, column=0)
+                              width=7, bg="#660000", fg="white",
+                              font="Arial 12 bold", command=partial(self.close_learn, partner))
+    self.dismiss_btn.grid(pady=5, padx=15)
 
   def close_learn(self, partner):
       # Put learn button back to normal..
@@ -112,6 +111,3 @@ if __name__ == "__main__":
     root.title("Guess the Note")
     s = Start(root)
     root.mainloop()
-
-
-# learn_button cannot be called in Learn class.
