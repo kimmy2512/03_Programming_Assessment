@@ -2,6 +2,8 @@
 # Make a "Normal" and "infinite" button
 # When normal is chosen, display entry box for number of questions wanted
 # when infinite is chosen, head to quiz window
+# no window for normal but entry box & normal button
+# click normal for int_check & go straight to quiz
 
 from tkinter import *
 from functools import partial    # To prevent unwanted windows
@@ -78,7 +80,7 @@ class Normal:
 
         self.how_heading = Label(self.normal_frame, text="Normal",
                                 font="Arial 17 bold")
-        self.how_heading.grid(row=1)
+        self.how_heading.grid(row=0)
         
         # Disable normal button
         parent.normal_button.config(state=DISABLED)
