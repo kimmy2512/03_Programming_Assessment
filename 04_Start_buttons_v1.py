@@ -86,7 +86,7 @@ class Normal:
         parent.normal_button.config(state=DISABLED)
 
         # Give simple instructions to the user
-        instruction = Label(text="Please enter a number between 10 and 50 " 
+        instruction = Label(parent, text="Please enter a number between 10 and 50 " 
                                         "\nfor the number of questions you would "
                                         "\nlike to play.",
                                         font=("Arial", "11"))
