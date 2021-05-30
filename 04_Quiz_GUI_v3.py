@@ -125,11 +125,6 @@ class Quiz:
         self.instructions_label.grid(row=1)
 
         # Boxes go here (row 2)
-        box_text = "Arial 16 bold"
-        box_back = "#b9ea96"    # light green
-        box_width = 5
-
-        # Boxes go here (row 2)
 
         self.box_frame = Frame(self.quiz_frame)
         self.box_frame.grid(row=2, pady=10)
@@ -143,11 +138,11 @@ class Quiz:
         # Play button goes here (ro1 3)
         self.play_button = Button(self.game_frame, text="Open Boxes",
                                   bg="#FFFF33", font="Arial 15 bold", width=20,
-                                  padx=10, pady=10, command=self.reveal_boxes)
+                                  padx=10, pady=10, command=self.generate_question)
 
         # bind button to <enter> (users can push enter to reveal the boxes)
         self.play_button.focus()
-        self.play_button.bind('<Return>', lambda e: self.reveal_boxes())
+        self.play_button.bind('<Return>', lambda e: self.generate_question())
         self.play_button.grid(row=3)
         
         # Balance label                     
@@ -177,90 +172,44 @@ class Quiz:
 
 # Function code reference to Mystery Box project
 # Fix and change variables appropriately
-    def reveal_boxes(self):
-        # retrieve the balance from the initial function...
-        current_balance = self.balance.get()
-        stakes_multiplier = self.multiplier.get()
+    def generate_question(self):
 
-        round_winnings = 0
+        question_number = 0
         prizes = []
         stats_prizes = []
 
         # Allows photo to change depending on stakes.
         # Lead not in the list as that is always 0
-        copper = ["copper_low.gif", "copper_med.gif", "copper_high.gif"]
-        silver = ["silver_low.gif", "silver_med.gif", "silver_high.gif"]
-        gold = ["gold_low.gif", "gold_med.gif", "gold_high.gif"]
+        first_octave = ["C.gif", "D.gif", "E.gif", "F.gif", "G.gif", "A.gif", "B.gif"]
+        second_octave = ["C2.gif", "D2.gif", "E2.gif", "F2.gif", "G2.gif", "A2.gif", "B2.gif"]
 
         for item in range(0,3):
-            prize_num = random.randint(1,100)
+            prize_num = random.randint(1,10)
 
-            if 0 < prize_num <= 5:
-                prize = PhotoImage(file=gold[stakes_multiplier-1])
-                prize_list= "gold (${})".format(5* stakes_multiplier)
-                round_winnings += 5 * stakes_multiplier
-            elif 5 < prize_num <= 25:
-                prize = PhotoImage(file=silver[stakes_multiplier-1])
-                prize_list= "silver (${})".format(2* stakes_multiplier)
-                round_winnings += 2 * stakes_multiplier
-            elif 25 < prize_num <= 65:
-                prize = PhotoImage(file=copper[stakes_multiplier-1])
-                prize_list= "copper (${})".format(1* stakes_multiplier)
-                round_winnings += stakes_multiplier
+            if 0 < prize_num <= 50:
+                prize = PhotoImage(file=first_octave)
+                question_number += 1
             else:
-                prize = PhotoImage(file="lead.gif")
+                prize = PhotoImage(file=second_octave)
                 prize_list = "lead ($0)"
+                question_number += 1
 
             prizes.append(prize)
             stats_prizes.append(prize_list)
 
-        photo1 = prizes[0]
+        photo = prizes[0]
 
         # Display prizes & edit background...
-        self.prize1_label.config(image=photo1)
-        self.prize1_label.photo = photo1
-
-        # Deduct cost of quiz
-        current_balance -= 5 * stakes_multiplier
-
-        # Add winnings
-        current_balance += round_winnings
-
-        # Set balance to new balance
-        self.balance.set(current_balance)
-        # update quiz_stats_list with current balance (replace item position
-        # 1 with current balance)
-        self.quiz_stats_list[1] = current_balance
-
-        balance_statement = "Quiz Cost: ${}\nPayback: ${} \n" \
-                            "Current Balance: ${}".format(5 * stakes_multiplier,
-                                                          round_winnings,
-                                                          current_balance)
+        self.prize1_label.config(image=photo)
+        self.prize1_label.photo = photo
 
         # Add round results to stats list
-        round_summary = "{} | {} | {} - Cost: ${} \n" \
-                        "Payback: ${} | Current Balance: " \
-                        "${}".format(stats_prizes[0], stats_prizes[1],
-                                     stats_prizes[2],
-                                     5 * stakes_multiplier, round_winnings,
-                                     current_balance)
+        round_summary = "{} | {} | {} - Number of questions: {} \n"\
+                                    .format(stats_prizes[0], stats_prizes[1],
+                                     stats_prizes[2], question_number)
         self.round_stats_list.append(round_summary)
         self.stats_button.config(state=NORMAL)
         # print(self.round_stats_list)
-
-        # Edit label so user can see their balance
-        self.balance_label.configure(text=balance_statement)
-
-        if current_balance < 5 * stakes_multiplier:
-            self.play_button.config(state=DISABLED)
-            self.quiz_box.focus()
-            self.play_button.config(text="Quiz Over")
-
-            balance_statement = "Current Balance: ${}\n" \
-                                "Your balance is too low. You can only quit " \
-                                "or view your stats. Sorry about that.".format(current_balance)
-            self.balance_label.config(fg="#660000", font="Arial 10 bold",
-                                      text=balance_statement)
 
     def to_quit(self):
         root.destroy()
