@@ -4,6 +4,7 @@
 # when infinite is chosen, head to quiz window
 # no window for normal but entry box & normal button
 # click normal for int_check & go straight to quiz
+# Make next button and return button
 
 from tkinter import *
 from functools import partial    # To prevent unwanted windows
@@ -54,10 +55,10 @@ class Start:
   # A function that checks if the user input is an integer
   def int_check(self): 
     try:
-      int(self.total_questions.get())
+      total_questions = int(self.total_questions.get())
 
       # Check if user input is between 10 and 50 
-      if int(self.total_questions.get()) not in range(10, 50):
+      if total_questions not in range(10, 51):
         self.answer.config(text="Out of range. Please enter " 
                                 "\nan integer between 10 and 50", 
                                 font=("Arial", "12"), fg="red")
@@ -65,7 +66,7 @@ class Start:
       
       else:
         self.answer.config(text="Okay!", font=("Arial", "12"), fg="green")
-        to_infinite = Quiz(self)
+        to_infinite = Quiz(total_questions)
         # hide start up window
         root.withdraw()
 
@@ -86,17 +87,17 @@ class Start:
 
 # Class code reference to Mystery Box project
 class Quiz:
-    def __init__(self, starting_balance):
-        print(starting_balance)
+    def __init__(self, total_questions):
+        print(total_questions)
 
         # initialise variables
         self.balance = IntVar()
         # Set starting balance to amount entered by user at start of quiz
-        self.balance.set(starting_balance)
+        self.balance.set(total_questions)
 
         # List for holding stats
         self.round_stats_list = []
-        self.quiz_stats_list=[starting_balance, starting_balance]
+        self.quiz_stats_list=[total_questions, total_questions]
 
         # GUI Setup
         self.quiz_box = Toplevel()
@@ -124,7 +125,7 @@ class Quiz:
         self.qbox_frame.grid(row=2, pady=10)
 
         # Display with question photo before quiz begins
-        photo = PhotoImage(file="question.gif")
+        photo = PhotoImage(file="question_150.gif")
 
         self.prize1_label = Label(self.qbox_frame, image=photo, padx=10, pady=10)
         self.prize1_label.photo = photo
@@ -141,25 +142,25 @@ class Quiz:
         self.play_button.grid(row=3)
         
         # Balance label                     
-        self.question_no_label = Label(self.quiz_frame, font="Arial 12 bold", fg="green",
-                                   text="Total questions: {self.total_questions}", wrap=300,
+        self.total_question_label = Label(self.quiz_frame, font="Arial 12 bold", fg="green",
+                                   text="Total questions: {}".format(total_questions), wrap=300,
                                    justify=LEFT)
-        self.question_no_label.grid(row=4, pady=10)
+        self.total_question_label.grid(row=4, pady=10)
 
         # Help and quiz stats button (row 5)
-        self.help_export_frame = Frame(self.quiz_frame)
-        self.help_export_frame.grid(row=5, pady=10)
+        self.help_frame = Frame(self.quiz_frame)
+        self.help_frame.grid(row=6, pady=10)
 
-        self.help_button = Button(self.help_export_frame, text="Help / Rules",
+        self.help_button = Button(self.help_frame, text="Help / Rules",
                                   font="Arial 15 bold",
                                   bg="#808080", fg="white", command=self.help)
-        self.help_button.grid(row=0, column=0, padx=2, pady=10)
+        self.help_button.grid(row=6, pady=15)
 
         # Quit Button
         self.quit_button = Button(self.quiz_frame, text="Quit", fg="white",
                                   bg="#660000", font="Arial 15 bold", width=20,
-                                  command=self.to_quit, padx=10, pady=10)
-        self.quit_button.grid(row=6, pady=10)
+                                  command=self.to_quit, justify= LEFT, padx=5, pady=10)
+        self.quit_button.grid(row=7, pady=20)
 
     # Allow quiz window to be dismissed / quit
     def close_quiz(self):
@@ -168,19 +169,49 @@ class Quiz:
     # Function code reference to Mystery Box project
     # Fix and change variables appropriately
     def generate_question(self):
+      
+      # Make play button, instruction text and total question text disappear when quiz begins
+      self.play_button.destroy()
+      self.instructions_label.destroy()
+      self.total_question_label.destroy()
 
+      # Make return button - child window is closed and user returns to parent / Start window
+      self.return_button = Button(self.quiz_frame.destroy(),                                       text="Return",
+                                  font="Arial 15 bold",
+                                  bg="yellow", fg="black", justify=LEFT, command=self.Start)
+      self.return_button.grid(row=2)
+
+      # Display question text everytime random image is generated
+      self.question_line = Label(self, text="What is the note below?", font="Arial 10")
+      self.question_line.grid(row=1)
+
+      # Entry box for users to enter their answer
+      self.answer_input = Entry(self)
+      self.answer_input.grid(row=4, pady=10)
+
+
+
+
+
+
+
+      # Set question number to 0 and increase by 1 everytime a question is generated
       question_number = 0
       prizes = []
       stats_prizes = []
 
       # Allows photo to change depending on stakes.
       # Lead not in the list as that is always 0
-      first_octave = ["C.gif", "D.gif", "E.gif", "F.gif", "G.gif", "A.gif", "B.gif"]
-      second_octave = ["C2.gif", "D2.gif", "E2.gif", "F2.gif", "G2.gif", "A2.gif", "B2.gif"]
+      first_octave_list = ["C_150.gif", "D_150.gif", "E_150.gif", "F_150.gif", "G_150.gif", "A_150.gif", "B_150.gif"]
+      second_octave_list = ["C2_150.gif", "D2_150.gif", "E2_150.gif", "F2_150.gif", "G2_150.gif", "A2_150.gif", "B2_150.gif"]
+
+      # Random images in the list is the first and second octave
+      first_octave = random.choice(first_octave_list)
+      second_octave = random.choice(second_octave_list)
 
       for item in range(0,3):
         prize_num = random.randint(1,10)
-
+      
         if 0 < prize_num <= 50:
           prize = PhotoImage(file=first_octave)
           question_number += 1
@@ -194,7 +225,7 @@ class Quiz:
 
       # Display prizes & edit background...
       self.prize1_label.config(image=photo)
-      self.prize1_label.photo = photo1
+      self.prize1_label.photo = photo
 
       # Add round results to stats list
       round_summary = "{} | {} | {} - Number of questions: {} \n"\
@@ -323,3 +354,5 @@ if __name__ == "__main__":
 # Find images and download for quiz generation
 # Change variable names appropriately
 # download question.gif
+# Resize images to 150 x 150 pix
+# Make next button and return button
