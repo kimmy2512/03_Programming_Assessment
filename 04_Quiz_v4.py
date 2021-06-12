@@ -191,11 +191,12 @@ class Quiz:
       # Create a next button so that when it is pushed, another image randomly generates
       self.next_button = Button(self.input_frame, text="Next",
                                   font="Arial 13 bold",
-                                  bg="light blue", fg="black", command=self.check_input, justify=RIGHT)
+                                  bg="light blue", fg="black", command=self.combined_func, justify=RIGHT)
       self.next_button.grid(row=4, column=1)
 
-      # Incorrect and correct label (row=8, column=1)
-
+      # Make space for message shown about user input
+      self.mssg = Label(self.quiz_frame, text='')
+      self.mssg.grid(row=7, pady=20)
 
 
 
@@ -217,7 +218,7 @@ class Quiz:
       a = ["A_150.gif", "A2_150_gif"]
       b = ["B_150.gif", "B2_150_gif"]
 
-     # put all notes in a list
+      # put all notes in a list
       c.append(note_images)
       d.append(note_images)
       e.append(note_images)
@@ -226,73 +227,17 @@ class Quiz:
       a.append(note_images)
       b.append(note_images)
 
-      # Make space for message shown about user input
-      self.mssg = Label(self.quiz_frame, text='')
-      self.mssg.grid(row=7, pady=20)
-
       # Call user input, set input into lower case, and make it into a variable
       user_answer = str(self.answer_input.get().lower())
-
-
-
-
-
-      
-      image = self.image.get(self.generate_image, self.check_input)
 
       # Check if user input is string
       if user_answer.isalpha():
 
         # if user input is in the list, it is accepted & is valid
         if user_answer in note:
+          self.mssg.config(text="You entered a note!",
+                                  font=("Arial", "12"), fg="green")
 
-          # Begin checking user answer by comparing it to the original answer - print correct or incorrect
-          if user_answer == "c":
-            if image == c:
-              self.mssg.config(text="Correct!", font=("Arial", "12"), fg="green")
-            else:
-              self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
-
-          elif user_answer == "d":
-            if image == d:
-              self.mssg.config(text="Correct!", font=("Arial", "12"), fg="green")
-            else:
-              self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
-
-          elif user_answer == "e":
-            if image == e:
-              self.mssg.config(text="Correct!", font=("Arial", "12"), fg="green")
-            else:
-              self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
-
-          elif user_answer == "f":
-            if image == f:
-              self.mssg.config(text="Correct!", font=("Arial", "12"), fg="green")
-            else:
-              self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
-
-          elif user_answer == "g":
-            if image == g:
-              self.mssg.config(text="Correct!", font=("Arial", "12"), fg="green")
-            else:
-              self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
-
-          elif user_answer == "a":
-            if image == a:
-              self.mssg.config(text="Correct!", font=("Arial", "12"), fg="green")
-            else:
-              self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
-
-          elif user_answer == "b":
-            if image == b:
-              self.mssg.config(text="Correct!", font=("Arial", "12"), fg="green")
-            else:
-              self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
-
-          # Generate the next question / image once user answers a question
-          self.generate_image()
-
-        # Print error message if user input is not a letter (float or int)
         else:
           self.mssg.config(text="Please enter a letter "
                             "\nof a musical note", font=("Arial", "12"), fg="red")
@@ -312,7 +257,11 @@ class Quiz:
                                 font=("Arial", "12"), fg="red")
 
         return False
-  
+
+    # Allow next button to do multiple commands
+    def combined_func(self):
+      self.check_input()
+      self.generate_image()
 
 
 
@@ -333,21 +282,20 @@ class Quiz:
       # Random images in the list is the first and second octave
       first_octave = random.choice(first_octave_list)
       second_octave = random.choice(second_octave_list)
-
-      first_octave_image = "Programming_images/" + first_octave
-      second_octave_image = "Programming_images/" + second_octave
+      one_note = "Programming_images/" + first_octave
+      second_note = "Programming_images/" + second_octave
 
       for item in range(0,3):
         image_num = random.randint(1,10)
       
         if 0 < image_num <= 50:
-          self.image = PhotoImage(file=first_octave_image)
+          image = PhotoImage(file=one_note)
           question_number += 1
         else:
-          self.image = PhotoImage(file=second_octave_image)
+          image = PhotoImage(file=second_note)
           question_number += 1
           
-        images.append(self.image)
+        images.append(image)
 
       photo = images[0]
       

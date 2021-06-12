@@ -122,7 +122,7 @@ class Quiz:
         self.qbox_frame.grid(row=2, pady=10)
 
         # Display with question photo before quiz begins
-        photo = PhotoImage(file="question_150.gif")
+        photo = PhotoImage(file="Programming_images/question_150.gif")
 
         self.photo1_label = Label(self.qbox_frame, image=photo, padx=10, pady=10)
         self.photo1_label.photo = photo
@@ -191,10 +191,30 @@ class Quiz:
       # Create a next button so that when it is pushed, another image randomly generates
       self.next_button = Button(self.input_frame, text="Next",
                                   font="Arial 13 bold",
-                                  bg="light blue", fg="black", command=self.combined_func, justify=RIGHT)
+                                  bg="light blue", fg="black", command=self.check_input, justify=RIGHT)
       self.next_button.grid(row=4, column=1)
 
-      # Incorrect and correct label (row=8, column=1)
+      # Make space for message shown about user input
+      self.mssg = Label(self.quiz_frame, text='')
+      self.mssg.grid(row=7, pady=20)
+
+      # Create new frame for feedbacks
+      self.feedback_frame = Frame(self.quiz_frame)
+      self.feedback_frame.grid(row=8)
+
+      # Set correct and incorrect labels to 0
+      self.correct_number = 0
+      self.incorrect_number = 0
+
+      # Make correct and incorrect label
+      self.correct = Label(self.feedback_frame, font="Arial 11 bold", text="Correct: {}".format(self.correct_number), justify=LEFT)
+      self.correct.grid(row=8, column=0, padx=5)
+
+      self.incorrect = Label(self.feedback_frame, font="Arial 11 bold", text="Inorrect: {}".format(self.incorrect_number), justify=RIGHT)
+      self.correct.grid(row=8, column=1)
+
+
+
 
 
 
@@ -207,6 +227,7 @@ class Quiz:
       # Create a list for notes
       note_images = []
       note = ["c", "d", "e", "f", "g", "a", "b"] 
+      store_user_answer = ['']
 
       # make sure that the correct notes are the correct variable so that it can be used to check answer
       c = ["C_150.gif", "C2_150_gif"]
@@ -217,7 +238,7 @@ class Quiz:
       a = ["A_150.gif", "A2_150_gif"]
       b = ["B_150.gif", "B2_150_gif"]
 
-      # put all notes in a list
+     # put all notes in a list
       c.append(note_images)
       d.append(note_images)
       e.append(note_images)
@@ -226,21 +247,29 @@ class Quiz:
       a.append(note_images)
       b.append(note_images)
 
-      # Make space for message shown about user input
-      self.mssg = Label(self.quiz_frame, text='')
-      self.mssg.grid(row=7, pady=20)
-
       # Call user input, set input into lower case, and make it into a variable
       user_answer = str(self.answer_input.get().lower())
+      store_user_answer.append(user_answer)
 
       # Check if user input is string
       if user_answer.isalpha():
 
         # if user input is in the list, it is accepted & is valid
         if user_answer in note:
-          self.mssg.config(text="You entered a note!",
-                                  font=("Arial", "12"), fg="green")
 
+          # Begin checking user answer by comparing it to the original answer - print correct or incorrect
+          if user_answer == self.answer:
+            self.mssg.config(text="Correct!", font=("Arial", "12"), fg="green")
+            self.correct_number += 1
+            
+          else:
+            self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
+            self.incorrect_number += 1
+
+          # Generate next question after user answers the question
+          self.generate_image()
+
+        # Print error message if user input is not a letter (float or int)
         else:
           self.mssg.config(text="Please enter a letter "
                             "\nof a musical note", font=("Arial", "12"), fg="red")
@@ -260,11 +289,9 @@ class Quiz:
                                 font=("Arial", "12"), fg="red")
 
         return False
+  
 
-    # Allow next button to do multiple commands
-    def combined_func(self):
-      self.check_input()
-      self.generate_image()
+
 
 
 
@@ -273,31 +300,23 @@ class Quiz:
 
     # Allow image to be generated randomly
     def generate_image(self):
+
       # Set question number to 0 and increase by 1 everytime a question is generated
       question_number = 0
       images = []
 
-      # Allows photo to change depending on stakes.
       # Lead not in the list as that is always 0
-      first_octave_list = ["C_150.gif", "D_150.gif", "E_150.gif", "F_150.gif", "G_150.gif", "A_150.gif", "B_150.gif"]
-      second_octave_list = ["C2_150.gif", "D2_150.gif", "E2_150.gif", "F2_150.gif", "G2_150.gif", "A2_150.gif", "B2_150.gif"]
+      octave_list = ["C_150.gif", "D_150.gif", "E_150.gif", "F_150.gif", "G_150.gif", "A_150.gif", "B_150.gif", "C2_150.gif", "D2_150.gif", "E2_150.gif", "F2_150.gif", "G2_150.gif", "A2_150.gif", "B2_150.gif"]
 
       # Random images in the list is the first and second octave
-      first_octave = random.choice(first_octave_list)
-      second_octave = random.choice(second_octave_list)
+      octave = random.choice(octave_list)
 
-      for item in range(0,3):
-        image_num = random.randint(1,10)
-      
-        if 0 < image_num <= 50:
-          image = PhotoImage(file=first_octave)
-          question_number += 1
-        else:
-          image = PhotoImage(file=second_octave)
-          question_number += 1
+      question_image = "Programming_images/" + octave
+      self.image = PhotoImage(file=question_image)
+      question_number += 1
+      self.answer = question_image[0]
           
-        images.append(image)
-
+      images.append(self.image)
       photo = images[0]
       
       # Display prizes & edit background...
@@ -418,3 +437,8 @@ if __name__ == "__main__":
     s = Start(root)
     root.mainloop()
 
+
+# Generqate answer as first letter (example in sandpit)
+# store question and answer as string (same as mystery box balance storing)
+# Make first, second octave list into one
+# gold slide: 2 label (e.g. incorrect: {}) or 4 label (correct, number_correct, incorrect, number_incorrect label) for incorrect and correct label

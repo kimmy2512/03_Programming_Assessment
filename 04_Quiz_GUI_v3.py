@@ -121,7 +121,7 @@ class Quiz:
         self.qbox_frame.grid(row=2, pady=10)
 
         # Display with question photo before quiz begins
-        photo = PhotoImage(file="question_150.gif")
+        photo = PhotoImage(file="Programming_images/question_150.gif")
 
         self.photo1_label = Label(self.qbox_frame, image=photo, padx=10, pady=10)
         self.photo1_label.photo = photo
@@ -209,15 +209,17 @@ class Quiz:
       # Random images in the list is the first and second octave
       first_octave = random.choice(first_octave_list)
       second_octave = random.choice(second_octave_list)
+      one_note = "Programming_images/" + first_octave
+      second_note = "Programming_images/" + second_octave
 
       for item in range(0,3):
         image_num = random.randint(1,10)
       
         if 0 < image_num <= 50:
-          image = PhotoImage(file=first_octave)
+          image = PhotoImage(file=one_note)
           question_number += 1
         else:
-          image = PhotoImage(file=second_octave)
+          image = PhotoImage(file=second_note)
           question_number += 1
           
         images.append(image)
