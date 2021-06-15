@@ -92,9 +92,14 @@ class Quiz:
         print(total_questions)
 
         # initialise variables
-        self.balance = IntVar()
-        # Set starting balance to amount entered by user at start of quiz
-        self.balance.set(total_questions)
+        self.correct_ans = StringVar()
+
+        # Set correct and incorrect labels to 0
+        self.correct_number = IntVar()
+        self.correct_number.set(0)
+
+        # Set question number to 0 and increase by 1 everytime a question is generated
+        self.question_number = 0
 
         # GUI Setup
         self.quiz_box = Toplevel()
@@ -202,19 +207,11 @@ class Quiz:
       self.feedback_frame = Frame(self.quiz_frame)
       self.feedback_frame.grid(row=8)
 
-      # Set correct and incorrect labels to 0
-      self.correct_number = 0
-      self.incorrect_number = 0
-
       # Make correct and incorrect label
-      self.correct = Label(self.feedback_frame, font="Arial 11 bold", text="Correct: {}".format(self.correct_number), justify=LEFT)
-      self.correct.grid(row=8, column=0, padx=5)
+      self.correct_label = Label(self.feedback_frame, font="Arial 11 bold", text="Correct: 0", justify=LEFT)
+      self.correct_label.grid(row=8, column=0, padx=5)
 
-      self.incorrect = Label(self.feedback_frame, font="Arial 11 bold", text="Inorrect: {}".format(self.incorrect_number), justify=RIGHT)
-      self.correct.grid(row=8, column=1)
-
-
-
+      # Add back incorrect label and ss for testing and trialling
 
 
 
@@ -225,71 +222,41 @@ class Quiz:
     def check_input(self):
 
       # Create a list for notes
-      note_images = []
       note = ["c", "d", "e", "f", "g", "a", "b"] 
-      store_user_answer = ['']
-
-      # make sure that the correct notes are the correct variable so that it can be used to check answer
-      c = ["C_150.gif", "C2_150_gif"]
-      d = ["D_150.gif", "D2_150_gif"]
-      e = ["E_150.gif", "E2_150_gif"]
-      f = ["F_150.gif", "F2_150_gif"]
-      g = ["G_150.gif", "G2_150_gif"]
-      a = ["A_150.gif", "A2_150_gif"]
-      b = ["B_150.gif", "B2_150_gif"]
-
-     # put all notes in a list
-      c.append(note_images)
-      d.append(note_images)
-      e.append(note_images)
-      f.append(note_images)
-      g.append(note_images)
-      a.append(note_images)
-      b.append(note_images)
 
       # Call user input, set input into lower case, and make it into a variable
-      user_answer = str(self.answer_input.get().lower())
-      store_user_answer.append(user_answer)
+      user_answer = self.answer_input.get().lower()
+      correct = self.correct_ans.get().lower()
 
-      # Check if user input is string
-      if user_answer.isalpha():
-
-        # if user input is in the list, it is accepted & is valid
-        if user_answer in note:
-
-          # Begin checking user answer by comparing it to the original answer - print correct or incorrect
-          if user_answer == self.answer:
-            self.mssg.config(text="Correct!", font=("Arial", "12"), fg="green")
-            self.correct_number += 1
-            
-          else:
-            self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
-            self.incorrect_number += 1
-
-          # Generate next question after user answers the question
-          self.generate_image()
-
-        # Print error message if user input is not a letter (float or int)
-        else:
-          self.mssg.config(text="Please enter a letter "
-                            "\nof a musical note", font=("Arial", "12"), fg="red")
-
-          return False
+      number_correct = self.correct_number.get()
       
-      # Display error message if input box is empty
-      elif user_answer == '':
-        self.mssg.config(text="Please enter an answer", 
-                                font=("Arial", "12"), fg="red")
 
-        return False
+      # if user input is in the list, it is accepted & is valid
+      if user_answer in note:
 
-      # Display error message if user input is not string
+        # Begin checking user answer by comparing it to the original answer - print correct or incorrect
+        if user_answer == correct:
+          self.mssg.config(text="Correct!", font=("Arial", "12"), fg="green")
+          number_correct += 1
+          self.correct_number.set(number_correct)
+          num_correct_label = "Correct #: {}".format(number_correct)
+          self.correct_label.config(text=num_correct_label)
+          
+        else:
+          self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
+          
+
+        # Generate next question after user answers the question
+        self.generate_image()
+
+      # Print error message if user input is not a letter (float or int)
       else:
-        self.mssg.config(text="Sorry, please enter letters only", 
-                                font=("Arial", "12"), fg="red")
+        self.mssg.config(text="Please enter a letter "
+                          "\nof a musical note", font=("Arial", "12"), fg="red")
 
         return False
-  
+      
+
 
 
 
@@ -301,8 +268,6 @@ class Quiz:
     # Allow image to be generated randomly
     def generate_image(self):
 
-      # Set question number to 0 and increase by 1 everytime a question is generated
-      question_number = 0
       images = []
 
       # Lead not in the list as that is always 0
@@ -313,8 +278,8 @@ class Quiz:
 
       question_image = "Programming_images/" + octave
       self.image = PhotoImage(file=question_image)
-      question_number += 1
-      self.answer = question_image[0]
+      self.question_number += 1
+      self.correct_ans.set(octave[0])
           
       images.append(self.image)
       photo = images[0]
@@ -441,4 +406,8 @@ if __name__ == "__main__":
 # Generqate answer as first letter (example in sandpit)
 # store question and answer as string (same as mystery box balance storing)
 # Make first, second octave list into one
-# gold slide: 2 label (e.g. incorrect: {}) or 4 label (correct, number_correct, incorrect, number_incorrect label) for incorrect and correct label
+
+
+# Change correct: {} , Incorrect: {} to Correct out of....  (number of questions for normal mode)
+# Edit incorrect part.
+# End game if user gets incorrect for infinite mode
