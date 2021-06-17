@@ -22,7 +22,7 @@ class Start:
     self.start_frame.grid()
     
     # Start up intro (clicking normal or infinite)
-    start_intro = Label(parent, text="Welcome to the quiz of Guess the Note! "
+    start_intro = Label(self.start_frame, text="Welcome to the quiz of Guess the Note! "
                                     "\nPlease enter the number of questions wanted "
                                     "\n (between 10 and 50) for normal mode. Ignore "
                                     "\nthe input box and click the infinite button "
@@ -33,6 +33,17 @@ class Start:
     # Allow user to input the number of questions they want
     self.total_questions = Entry(parent)
     self.total_questions.grid(pady=10)
+
+    # Set total questions as 0
+    total_questions = IntVar()
+    total_questions.set(0)
+
+
+    # Display the number of questions wanted in normal mode but not in infinite mode                  
+    self.total_question_label = Label(self.start_frame, font="Arial 12 bold", fg="green",
+                                text="How many questions do you want: ?", wrap=300,
+                                justify=LEFT)
+    self.total_question_label.grid(row=4, pady=10)
 
     self.answer = Label(parent, text='')
     self.answer.grid(pady=20)
@@ -89,6 +100,29 @@ class Start:
 # Class code reference to Mystery Box project
 class Quiz:
     def __init__(self, total_questions):
+
+        # GUI Setup
+        self.quiz_box = Toplevel()
+        
+        # If users press at top, quiz quits
+        self.quiz_box.protocol('WM_DELETE_WINDOW',self.to_quit)
+
+        self.quiz_frame = Frame(self.quiz_box)
+        self.quiz_frame.grid()
+
+      # Display the number of questions wanted in normal mode but not in infinite mode                  
+        self.total_question_label = Label(self.quiz_frame, font="Arial 12 bold", fg="green",
+                                    text="Total questions: {}".format(total_questions), wrap=300,
+                                    justify=LEFT)
+        self.total_question_label.grid(row=4, pady=10)
+
+       # Change total_questions number to infinite mode when user input 
+        if total_questions not in range(10,50):
+          self.total_question_label.config(text="--- Infinite Mode ---")
+
+        else:
+          pass
+
         print(total_questions)
 
         # initialise variables
@@ -100,15 +134,6 @@ class Quiz:
 
         # Set question number to 0 and increase by 1 everytime a question is generated
         self.question_number = 0
-
-        # GUI Setup
-        self.quiz_box = Toplevel()
-
-        # If users press at top, quiz quits
-        self.quiz_box.protocol('WM_DELETE_WINDOW', self.to_quit)
-
-        self.quiz_frame = Frame(self.quiz_box)
-        self.quiz_frame.grid()
 
         # Heading Row
         self.heading_label = Label(self.quiz_frame, text="Guess the Note",
@@ -142,12 +167,6 @@ class Quiz:
         self.play_button.focus()
         self.play_button.bind('<Return>', lambda e: self.generate_question())
         self.play_button.grid(row=3)
-        
-        # Display the number of questions wanted in normal mode but not in infinite mode                  
-        self.total_question_label = Label(self.quiz_frame, font="Arial 12 bold", fg="green",
-                                   text="Total questions: {}".format(total_questions), wrap=300,
-                                   justify=LEFT)
-        self.total_question_label.grid(row=4, pady=10)
 
         # Help and quiz stats button (row 5)
         self.help_frame = Frame(self.quiz_frame)
@@ -238,8 +257,12 @@ class Quiz:
         if user_answer == correct:
           self.mssg.config(text="Correct!", font=("Arial", "12"), fg="green")
           number_correct += 1
+
+          # Reset number_correct when 1 is added
           self.correct_number.set(number_correct)
-          num_correct_label = "Correct #: {}".format(number_correct)
+
+          
+          num_correct_label = "Correct: {}".format(number_correct)
           self.correct_label.config(text=num_correct_label)
           
         else:
@@ -411,3 +434,4 @@ if __name__ == "__main__":
 # Change correct: {} , Incorrect: {} to Correct out of....  (number of questions for normal mode)
 # Edit incorrect part.
 # End game if user gets incorrect for infinite mode
+# change quit button so that it can go back to the start window

@@ -136,12 +136,6 @@ class Quiz:
         self.play_button.focus()
         self.play_button.bind('<Return>', lambda e: self.generate_question())
         self.play_button.grid(row=3)
-        
-        # Display the number of questions wanted in normal mode but not in infinite mode                  
-        self.total_question_label = Label(self.quiz_frame, font="Arial 12 bold", fg="green",
-                                   text="Total questions: {}".format(total_questions), wrap=300,
-                                   justify=LEFT)
-        self.total_question_label.grid(row=4, pady=10)
 
         # Help and quiz stats button (row 5)
         self.help_frame = Frame(self.quiz_frame)
@@ -172,29 +166,25 @@ class Quiz:
       # Make play button, instruction text and total question text disappear when quiz begins
       self.play_button.destroy()
       self.instructions_label.destroy()
-      self.total_question_label.destroy()
 
       self.generate_image()
-
-      # Make return button - child window is closed and user returns to parent / Start window
-      self.return_button = Button(self.quiz_frame, text="Return",
-                                  font="Arial 15 bold",
-                                  bg="yellow", fg="black", justify=LEFT)
-      self.return_button.grid(row=2)
     
       # Display question text everytime random image is generated
       self.question_line = Label(self.quiz_frame, text="What is the note below?", font="Arial 14")
       self.question_line.grid(row=1)
 
+      self.input_frame = Frame(self.quiz_frame)
+      self.input_frame.grid(row=6, pady=10)
+
       # Entry box for users to enter their answer
-      self.answer_input = Entry(self.quiz_frame)
-      self.answer_input.grid(row=4, pady=10)
+      self.answer_input = Entry(self.input_frame)
+      self.answer_input.grid(row=4, column=0, padx=5)
 
       # Create a next button so that when it is pushed, another image randomly generates
-      self.next_button = Button(self.quiz_frame, text="Next",
+      self.next_button = Button(self.input_frame, text="Next",
                                   font="Arial 13 bold",
-                                  bg="light blue", fg="black", command=self.generate_image, justify=LEFT)
-      self.next_button.grid(row=4, pady=20)
+                                  bg="light blue", fg="black", command=self.generate_image, justify=RIGHT)
+      self.next_button.grid(row=4, column=1)
 
     def generate_image(self):
       # Set question number to 0 and increase by 1 everytime a question is generated
