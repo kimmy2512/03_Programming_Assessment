@@ -1,14 +1,7 @@
 # To Do list: 
-# Generate image depending on the number of questions user wanted in normal mode
-# Make infinite mode work
-# Make quit button allow start window to stay open when it's clicked
-# Print the number of correct and incorrect below the entry box
-# Say good job if user input is in the list (of notes)
-# Display no. questions answered & remaining
-# Check gerenate_image depending on user input (might change image although input is returned false)
-# Generqate answer as first letter (example in sandpit)
-# store question and answer as string (same as mystery box balance storing)
-# Make first, second octave list into one
+# End game if user gets incorrect for infinite mode
+# change quit button so that it can go back to the start window
+# Change Correct label into question number label
 
 
 from tkinter import *
@@ -25,11 +18,12 @@ class Start:
     self.start_frame.grid()
     
     # Start up intro (clicking normal or infinite)
-    start_intro = Label(self.start_frame, text="Welcome to the quiz of Guess the Note! "
-                                    "\nPlease enter the number of questions wanted "
-                                    "\n (between 10 and 50) for normal mode. Ignore "
-                                    "\nthe input box and click the infinite button "
-                                    "\nfor the infinite mode.",
+    start_intro = Label(self.start_frame, text="Welcome to Guess the Note! "
+    "\n"
+                                    "\nEnter a number and click the yellow "
+                                    "\nbutton for normal mode, ignore and "
+                                    "\nclick the orange button for infinite "
+                                    "\nmode!",
                                       font=("Arial", "11"))
     start_intro.grid(pady=15)
 
@@ -44,7 +38,7 @@ class Start:
 
     # Display the number of questions wanted in normal mode but not in infinite mode                  
     self.total_question_label = Label(self.start_frame, font="Arial 12 bold", fg="green",
-                                text="How many questions do you want: ?", wrap=300,
+                                text="How many questions do you want (between 10 - 50): ?", wrap=300,
                                 justify=LEFT)
     self.total_question_label.grid(row=4, pady=10)
 
@@ -126,14 +120,21 @@ class Quiz:
         else:
           pass
 
-        print(total_questions)
-
         # initialise variables
         self.correct_ans = StringVar()
 
-        # Set correct and incorrect labels to 0
+        # Set current question number value as 0
+        self.current_number = IntVar()
+        self.current_number.set(1)
+
         self.correct_number = IntVar()
         self.correct_number.set(0)
+
+        self.incorrect_number = IntVar()
+        self.incorrect_number.set(0)
+
+        self.limit = IntVar()
+        self.limit.set(total_questions)
 
         # Set question number to 0 and increase by 1 everytime a question is generated
         self.question_number = 0
@@ -202,7 +203,11 @@ class Quiz:
       self.instructions_label.destroy()
       self.total_question_label.destroy()
 
+      # Make program generate a random image of a musical note
       self.generate_image()
+
+      # Call variables
+      number_question = self.current_number.get()
     
       # Display question text everytime random image is generated
       self.question_line = Label(self.quiz_frame, text="What is the note below?", font="Arial 14")
@@ -229,16 +234,36 @@ class Quiz:
       self.feedback_frame = Frame(self.quiz_frame)
       self.feedback_frame.grid(row=8)
 
-      # Make correct and incorrect label
-      self.correct_label = Label(self.feedback_frame, font="Arial 11 bold", text="Correct: 0", justify=LEFT)
-      self.correct_label.grid(row=8, column=0, padx=5)
+      # Make current question label
+      self.current_label = Label(self.feedback_frame, font="Arial 11 bold", text="Question: 1", justify=LEFT)
+      self.current_label.grid(row=8, column=0, padx=5)
 
-      # Add back incorrect label and ss for testing and trialling
+      '''# Get how many user asked for (question) & how many they have been asked. 
+      # If the numbe rof asked is less than the number they want, generate question/image
+      # Otherwise, destroy. 
+     
+      print(number_question, user_limit)
 
+      # Make a loop to check if question number is equal to the number of questions set
+      if number_question <= user_limit:
 
+        if number_question == user_limit:
+          self.next_button.destroy()
+          self.question_line.destroy()
+          self.answer_input.destroy()
+          self.mssg.destroy()
+          self.current_label.destroy()
 
+          print("Congrats")
 
-
+        else:
+          self.generate_image()
+          return False
+      
+      else:
+        print("Else")'''
+      
+      
 
     # When next button is pushed, check if user input is a string and check / compare to answer
     def check_input(self):
@@ -246,31 +271,41 @@ class Quiz:
       # Create a list for notes
       note = ["c", "d", "e", "f", "g", "a", "b"] 
 
-      # Call user input, set input into lower case, and make it into a variable
+      # Call all user input and variables from another class to create other variables
       user_answer = self.answer_input.get().lower()
-      correct = self.correct_ans.get().lower()
-
-      number_correct = self.correct_number.get()
-      
+      num_correct = self.correct_number.get()
+      num_incorrect = self.incorrect_number.get()
+      number_question = self.current_number.get()
+      correct_answer = self.correct_ans.get().lower()
+      user_limit = self.limit.get()
 
       # if user input is in the list, it is accepted & is valid
       if user_answer in note:
 
+        # Increase question number every correct or incorrect answer
+        number_question += 1
+
+        # Reset number_correct when 1 is added
+        self.current_number.set(number_question)
+
+        # Set question label
+        num_question_label = "Question: {}".format(number_question)
+        self.current_label.config(text=num_question_label) 
+
         # Begin checking user answer by comparing it to the original answer - print correct or incorrect
-        if user_answer == correct:
+        if user_answer == correct_answer:
           self.mssg.config(text="Correct!", font=("Arial", "12"), fg="green")
-          number_correct += 1
+          num_correct += 1
+          self.correct_number.set(num_correct)
 
-          # Reset number_correct when 1 is added
-          self.correct_number.set(number_correct)
-
-          
-          num_correct_label = "Correct: {}".format(number_correct)
-          self.correct_label.config(text=num_correct_label)
+        # If the number of questions is equal to the number of questions set at the start, go to end game
+        elif number_question >= user_limit:
+          print("congrats you have finished the game")
           
         else:
           self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
-          
+          num_incorrect += 1
+          self.incorrect_number.set(num_incorrect)         
 
         # Generate next question after user answers the question
         self.generate_image()
@@ -281,9 +316,6 @@ class Quiz:
                           "\nof a musical note", font=("Arial", "12"), fg="red")
 
         return False
-      
-
-
 
 
 
@@ -322,6 +354,23 @@ class Quiz:
     # Root to go to help class
     def help(self):
       get_help = Help(self)
+
+    # Create an ending page
+    def to_end(self):
+
+      # Destroy all other components in the frame
+      self.photo1_label.destroy()
+      self.num_question_label.destroy()
+      self.input_frame.destroy()
+      self.feedback_frame.destroy()
+      
+      # print appropriate ending page depending on user click of mode
+      if total_questions not in range(10,51):
+        print("Infinite mode")
+
+      else:
+        print("Normal mode")
+        
 
 # Display help / rules for users
 class Help:
@@ -428,4 +477,8 @@ if __name__ == "__main__":
     s = Start(root)
     root.mainloop()
 
+  
 
+  # move help button out of the entry box
+  # Fix the cover image
+  
