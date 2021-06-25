@@ -344,6 +344,7 @@ class Quiz:
     def to_return(self):
 
       # Destroy 
+      root.destroy()
       Start.after(1000,self.to_return)
 
 
@@ -382,9 +383,17 @@ class Quiz:
         self.ending_label = Label(self.quiz_frame, font="Arial 16 bold", fg="purple",
                                     text="Good Job! You have reached {} questions!", wrap=300,
                                     justify=LEFT)
-        self.ending_label.grid(row=2)
+        self.ending_label.grid(row=2, pady=20)
+
+      self.ending_frame = Frame(self.quiz_frame)
+      self.ending_frame.grid(row=3)
 
       # Create restart button
+      self.restart_button = Button(self.ending_frame, text="Restart", fg="black",
+                                  bg="yellow", font="Arial 12 bold", width=10,
+                                  command=self.to_return, justify= LEFT, padx=5, pady=5)
+      self.restart_button.grid(row=3, pady=20)
+
       # Create export button
 
       # Display number of questions correct 
@@ -396,8 +405,8 @@ class Quiz:
       self.t_question_label.grid(row=5)
 
       # Create done button (quit button)
-      self.done_button = Button(self.quiz_frame, text="Done", fg="black",
-                                  bg="white", font="Arial 15 bold", width=20,
+      self.done_button = Button(self.quiz_frame, text="Done", fg="white",
+                                  bg="#660000", font="Arial 15 bold", width=20,
                                   command=self.to_quit, justify= LEFT, padx=5, pady=10)
       self.done_button.grid(row=6, pady=20)
 
