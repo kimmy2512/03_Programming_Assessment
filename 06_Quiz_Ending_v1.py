@@ -7,6 +7,7 @@
 from tkinter import *
 from functools import partial    # To prevent unwanted windows
 import random   
+import os
 
 
 class Start:
@@ -107,19 +108,6 @@ class Quiz:
         self.quiz_frame = Frame(self.quiz_box)
         self.quiz_frame.grid()
 
-      # Display the number of questions wanted in normal mode but not in infinite mode                  
-        self.total_question_label = Label(self.quiz_frame, font="Arial 12 bold", fg="green",
-                                    text="Total questions: {}".format(total_questions), wrap=300,
-                                    justify=LEFT)
-        self.total_question_label.grid(row=4, pady=10)
-
-       # Change total_questions number to infinite mode when user input 
-        if total_questions not in range(10,50):
-          self.total_question_label.config(text="--- Infinite Mode ---")
-
-        else:
-          pass
-
         # initialise variables
         self.correct_ans = StringVar()
 
@@ -136,8 +124,21 @@ class Quiz:
         self.limit = IntVar()
         self.limit.set(total_questions)
 
-        # Set question number to 0 and increase by 1 everytime a question is generated
-        self.question_number = 0
+      # Display the number of questions wanted in normal mode but not in infinite mode                  
+        self.total_question_label = Label(self.quiz_frame, font="Arial 12 bold", fg="green",
+                                    text="Total questions: {}".format(total_questions), wrap=300,
+                                    justify=LEFT)
+        self.total_question_label.grid(row=4, pady=10)
+
+       # Change total_questions number to infinite mode when user input 
+        if total_questions not in range(10,50):
+          self.limit = IntVar()
+          total_questions = "Infinite Mode"
+          self.limit == total_questions
+          self.total_question_label.config(text="--- Infinite Mode ---")
+
+        else:
+          pass
 
         # Heading Row
         self.heading_label = Label(self.quiz_frame, text="Guess the Note",
@@ -184,15 +185,12 @@ class Quiz:
         # Quit Button
         self.quit_button = Button(self.quiz_frame, text="Quit", fg="white",
                                   bg="#660000", font="Arial 15 bold", width=20,
-                                  command=self.to_quit, justify= LEFT, padx=5, pady=10)
+                                  command=self.to_return, justify= LEFT, padx=5, pady=10)
         self.quit_button.grid(row=9, pady=20)
 
     # Allow quiz window to be dismissed / quit
     def close_quiz(self):
       self.quiz_box.destroy()
-
-    def to_start(self):
-      Start()
     
     # Function code reference to Mystery Box project
     # Fix and change variables appropriately
@@ -200,6 +198,7 @@ class Quiz:
       
       # Make play button, instruction text and total question text disappear when quiz begins
       self.play_button.destroy()
+      self.help_button.destroy()
       self.instructions_label.destroy()
       self.total_question_label.destroy()
 
@@ -236,35 +235,8 @@ class Quiz:
 
       # Make current question label
       self.current_label = Label(self.feedback_frame, font="Arial 11 bold", text="Question: 1", justify=LEFT)
-      self.current_label.grid(row=8, column=0, padx=5)
-
-      '''# Get how many user asked for (question) & how many they have been asked. 
-      # If the numbe rof asked is less than the number they want, generate question/image
-      # Otherwise, destroy. 
-     
-      print(number_question, user_limit)
-
-      # Make a loop to check if question number is equal to the number of questions set
-      if number_question <= user_limit:
-
-        if number_question == user_limit:
-          self.next_button.destroy()
-          self.question_line.destroy()
-          self.answer_input.destroy()
-          self.mssg.destroy()
-          self.current_label.destroy()
-
-          print("Congrats")
-
-        else:
-          self.generate_image()
-          return False
+      self.current_label.grid(row=8, column=0, padx=5)    
       
-      else:
-        print("Else")'''
-      
-      
-
     # When next button is pushed, check if user input is a string and check / compare to answer
     def check_input(self):
 
@@ -298,14 +270,31 @@ class Quiz:
           num_correct += 1
           self.correct_number.set(num_correct)
 
-        # If the number of questions is equal to the number of questions set at the start, go to end game
+        # If the number of questions is equal to the number of questions set at the start, go to end quiz
         elif number_question >= user_limit:
-          print("congrats you have finished the game")
+
+          # Delete other components when quiz ends
+          self.current_label.destroy()
+          self.mssg.destroy()
+
+          # Go to the end page function
+          self.to_end()
           
         else:
-          self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
-          num_incorrect += 1
-          self.incorrect_number.set(num_incorrect)         
+          # If user chose normal mode, continue quiz01210
+          if user_limit in range(10,51):
+            self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
+            num_incorrect += 1
+            self.incorrect_number.set(num_incorrect)   
+
+          # If user chose infinite mode, end quiz
+          else:
+            # Delete other components when quiz ends
+            self.current_label.destroy()
+            self.mssg.destroy()
+
+            # Go to the end page function
+            self.to_end()     
 
         # Generate next question after user answers the question
         self.generate_image()
@@ -336,7 +325,6 @@ class Quiz:
 
       question_image = "Programming_images/" + octave
       self.image = PhotoImage(file=question_image)
-      self.question_number += 1
       self.correct_ans.set(octave[0])
           
       images.append(self.image)
@@ -350,6 +338,17 @@ class Quiz:
     def to_quit(self):
       # Close window
       root.destroy()
+
+
+
+    def to_return(self):
+
+      # Destroy 
+      Start.after(1000,self.to_return)
+
+
+
+
     
     # Root to go to help class
     def help(self):
@@ -358,19 +357,51 @@ class Quiz:
     # Create an ending page
     def to_end(self):
 
+      # Call variable
+      user_limit = self.limit.get()
+      num_correct = self.correct_number.get()
+      num_incorrect = self.incorrect_number.get()
+
       # Destroy all other components in the frame
+      self.answer_input.destroy()
+      self.heading_label.destroy()
+      self.question_line.destroy()
+      self.quit_button.destroy()
       self.photo1_label.destroy()
-      self.num_question_label.destroy()
       self.input_frame.destroy()
       self.feedback_frame.destroy()
       
       # print appropriate ending page depending on user click of mode
-      if total_questions not in range(10,51):
-        print("Infinite mode")
+      if user_limit in range(10,51):
+        self.ending_label = Label(self.quiz_frame, font="Arial 16 bold", fg="purple",
+                                    text="Well Done you have completed the quiz!", wrap=300,
+                                    justify=LEFT)
+        self.ending_label.grid(row=2)
 
       else:
-        print("Normal mode")
-        
+        self.ending_label = Label(self.quiz_frame, font="Arial 16 bold", fg="purple",
+                                    text="Good Job! You have reached {} questions!", wrap=300,
+                                    justify=LEFT)
+        self.ending_label.grid(row=2)
+
+      # Create restart button
+      # Create export button
+
+      # Display number of questions correct 
+      self.correct_label = Label(self.quiz_frame, font="Arial 11 bold", text="Questions correct: {}".format(num_correct),  wrap=300,justify=LEFT)
+      self.correct_label.grid(row=4)
+
+      # Display number of questions & number of correct questions
+      self.t_question_label = Label(self.quiz_frame, font="Arial 11 bold", text="Total questions: {}".format(user_limit))
+      self.t_question_label.grid(row=5)
+
+      # Create done button (quit button)
+      self.done_button = Button(self.quiz_frame, text="Done", fg="black",
+                                  bg="white", font="Arial 15 bold", width=20,
+                                  command=self.to_quit, justify= LEFT, padx=5, pady=10)
+      self.done_button.grid(row=6, pady=20)
+
+
 
 # Display help / rules for users
 class Help:
@@ -472,6 +503,7 @@ class Learn:
 # Continue loop
 # main routine
 if __name__ == "__main__":
+
     root = Tk()
     root.title("Guess the Note")
     s = Start(root)
@@ -481,4 +513,8 @@ if __name__ == "__main__":
 
   # move help button out of the entry box
   # Fix the cover image
+  # Next button for infinite mode doesn't work
+  # Make ending page
+  # to_return function cannot restart program
+  # Create restart button
   
