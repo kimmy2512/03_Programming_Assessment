@@ -12,7 +12,7 @@ import os
 
 class Start:
   
-  def __init__(self, parent):
+  def __init__(self):
 
     # GUI to get starting question and mode
     self.start_frame = Frame(padx=10, pady=10)
@@ -29,8 +29,8 @@ class Start:
     start_intro.grid(pady=15)
 
     # Allow user to input the number of questions they want
-    self.total_questions = Entry(parent)
-    self.total_questions.grid(pady=10)
+    self.total_questions = Entry(self.start_frame)
+    self.total_questions.grid(row=5, pady=10)
 
     # Set total questions as 0
     total_questions = IntVar()
@@ -43,21 +43,21 @@ class Start:
                                 justify=LEFT)
     self.total_question_label.grid(row=4, pady=10)
 
-    self.answer = Label(parent, text='')
-    self.answer.grid(pady=20)
+    self.answer = Label(self.start_frame, text='')
+    self.answer.grid(row=6, pady=20)
     
     # Normal button
-    self.normal_button = Button(parent, text="Normal", font=("Arial", "14"), bg="yellow", 
+    self.normal_button = Button(self.start_frame, text="Normal", font=("Arial", "14"), bg="yellow", 
                                 fg="black", padx=5, pady=5, command=self.int_check)
     self.normal_button.grid(pady=5, padx=10)
     
     # Infinite buttony
-    self.infinite = Button(parent, text="Infinite", font=("Arial", "14"), bg="orange", 
+    self.infinite = Button(self.start_frame, text="Infinite", font=("Arial", "14"), bg="orange", 
                            fg="black", padx=5, pady=5, command=self.to_quiz)
     self.infinite.grid(pady=5, padx=20)
     
     # Learn Button (row 1)
-    self.learn_button = Button(parent, text="Learn", font=("Arial", "14"), 
+    self.learn_button = Button(self.start_frame, text="Learn", font=("Arial", "14"), 
                                 bg="light green", fg="black", padx=10, pady=5, 
                                 command=self.learn) 
     self.learn_button.grid(pady=10, padx=15)
@@ -306,12 +306,6 @@ class Quiz:
 
         return False
 
-
-
-
-
-
-
     # Allow image to be generated randomly
     def generate_image(self):
 
@@ -339,13 +333,11 @@ class Quiz:
       # Close window
       root.destroy()
 
-
-
     def to_return(self):
 
       # Destroy 
       root.destroy()
-      Start.after(1000,self.to_return)
+      Start()
 
 
 
@@ -515,7 +507,7 @@ if __name__ == "__main__":
 
     root = Tk()
     root.title("Guess the Note")
-    s = Start(root)
+    s = Start()
     root.mainloop()
 
   
