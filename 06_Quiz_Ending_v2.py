@@ -186,10 +186,6 @@ class Quiz:
                                 bg="#660000", font="Arial 15 bold", width=20,
                                 command=self.to_return, justify= LEFT, padx=5, pady=10)
       self.quit_button.grid(row=10, pady=20)
-
-    # Allow quiz window to be dismissed / quit
-    def close_quiz(self):
-      self.quiz_box.destroy()
       
     # When next button is pushed, check if user input is a string and check / compare to answer
     def check_input(self):
@@ -309,9 +305,10 @@ class Quiz:
 
     def to_return(self):
 
-      # Destroy 
-      root.destroy()
-      Start()
+      self.quiz_box.destroy()
+
+      # Unwithdraw
+      root.deiconify()
 
     # Root to go to help class
     def help(self):
@@ -436,13 +433,10 @@ if __name__ == "__main__":
 
   # move help button out of the entry box
   # Fix the cover image
-  # Next button for infinite mode doesn't work
-  # Make ending page
   # to_return function cannot restart program
   # No main play page. change first image to question mark. help/rules with game stats (involves export) within the quiz. Quit button down below. Quit might become restart. Export button. What is the note below = push next to begin. Delete end page, change the next button to "End of Quiz".
   # ADD ONE TO THE NUMER OF QUESTIONS USER WANT (SET UP) FOR INFINITE MODE, USE THE SAME CODE.
 
-  # Quit button is destroyed in to_return button. 
   # Don't have duplicate images showing
   # Make instructions clear
   # Clear user input
