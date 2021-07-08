@@ -409,10 +409,3 @@ if __name__ == "__main__":
     root.title("Guess the Note")
     s = Start()
     root.mainloop()
-
-
-  # Don't have duplicate images showing
-  # Make instructions clear
-  # Clear user input
-  # Bind next to <enter>
-  # Number of questions does not work

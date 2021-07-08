@@ -2,9 +2,6 @@
 # End game if user gets incorrect for infinite mode
 # change quit button so that it can go back to the start window
 # Change Correct label into question number label
-# move help button out of the entry box
-# Fix the cover image
-# fix to_return function - it cannot restart program
 
 
 from tkinter import *
@@ -20,13 +17,12 @@ class Start:
     self.start_frame = Frame(padx=10, pady=10)
     self.start_frame.grid()
     
-    # Start up intro (clicking normal or infinite)
+    # Start up intro 
     start_intro = Label(self.start_frame, text="Welcome to Guess the Note! "
     "\n"
-                                    "\nEnter a number and click the yellow "
-                                    "\nbutton for normal mode, ignore and "
-                                    "\nclick the orange button for infinite "
-                                    "\nmode!",
+                                    "\nWrite the number of questions "
+                                    "\nyou want and press <Start> to "
+                                    "\nto begin!",
                                       font=("Arial", "11"))
     start_intro.grid(pady=15)
 
@@ -38,6 +34,9 @@ class Start:
     total_questions = IntVar()
     total_questions.set(0)
 
+    self.restart_stats_list = IntVar()
+    self.restart_stats_list.set(0)
+
     # Ask how many questions user want            
     self.total_question_label = Label(self.start_frame, font="Arial 12 bold", fg="green",
                                 text="How many questions do you want (between 10 - 50): ?", wrap=300,
@@ -47,15 +46,10 @@ class Start:
     self.answer = Label(self.start_frame, text='')
     self.answer.grid(row=6, pady=20)
     
-    # Normal button
-    self.normal_button = Button(self.start_frame, text="Normal", font=("Arial", "14"), bg="yellow", 
-                                fg="black", padx=5, pady=5, command=self.int_check)
-    self.normal_button.grid(pady=5, padx=10)
-    
-    # Infinite buttony
-    self.infinite = Button(self.start_frame, text="Infinite", font=("Arial", "14"), bg="orange", 
-                           fg="black", padx=5, pady=5, command=self.to_quiz)
-    self.infinite.grid(pady=5, padx=20)
+    # Start button
+    self.start_button = Button(self.start_frame, text="Start", font="Cabin 20 bold", bg="yellow", 
+                                fg="black", padx=20, pady=10, command=self.int_check)
+    self.start_button.grid(pady=5, padx=10)
     
     # Learn Button (row 1)
     self.learn_button = Button(self.start_frame, text="Learn", font=("Arial", "14"), 
@@ -67,6 +61,7 @@ class Start:
   def int_check(self): 
     try:
       total_questions = int(self.total_questions.get())
+      restart_list = int(self.restart_stats_list.get())
 
       # Check if user input is between 10 and 50 
       if total_questions not in range(10, 51):
@@ -77,7 +72,7 @@ class Start:
       
       else:
         self.answer.config(text="Okay!", font=("Arial", "12"), fg="green")
-        to_infinite = Quiz(total_questions)
+        to_play = Quiz(total_questions, restart_list)
         # hide start up window
         root.withdraw()
 
@@ -90,15 +85,15 @@ class Start:
   def learn(self):
     to_learn = Learn(self)
     
-# Infinite button leads directly to quiz window & begin quiz
+# button leads directly to quiz window & begin quiz
   def to_quiz(self):
-    to_infinite = Quiz(self)
+    to_play = Quiz(self)
     # hide start up window
     root.withdraw()
 
 # Class code reference to Mystery Box project
 class Quiz:
-    def __init__(self, total_questions):
+    def __init__(self, total_questions, restart_list):
 
       # GUI Setup
       self.quiz_box = Toplevel()
@@ -125,16 +120,17 @@ class Quiz:
       self.limit = IntVar()
       self.limit.set(total_questions)
 
-      # Change total_questions number to infinite mode when user input 
-      if total_questions not in range(10,50):
-        self.limit = IntVar()
-        self.limit == total_questions 
+      # Variables & lists for quiz stats class
+      self.restart_stats_num = IntVar()
+      self.restart_stats_num.set(restart_list)
+      self.round_stats_list = []
 
-      else:
-        pass
+      # quiz stats...
+      self.quiz_stats_list=[total_questions, total_questions]
+      self.question_input = []
 
       # Boxes goes here
-      self.qbox_frame = Frame(self.quiz_frame)
+      self.qbox_frame = Frame(self.quiz_frame, padx=10, pady=10)
       self.qbox_frame.grid(row=2, pady=10)
 
       # Function code reference to Mystery Box project
@@ -157,7 +153,7 @@ class Quiz:
 
       # Create a next button so that when it is pushed, another image randomly generates
       self.next_button = Button(self.input_frame, text="Next",
-                                  font="Arial 13 bold",
+                                  font="Arial 14 bold",
                                   bg="light blue", fg="black", command=self.check_input, justify=RIGHT)
       self.next_button.focus()
       self.next_button.bind('<Return>', lambda e: self.generate_question())
@@ -176,23 +172,35 @@ class Quiz:
       self.current_label.grid(row=8, column=0, padx=5)    
 
       # Help and quiz stats button (row 5)
-      self.help_frame = Frame(self.quiz_frame)
-      self.help_frame.grid(row=9, pady=10)
+      self.help_export_frame = Frame(self.quiz_frame)
+      self.help_export_frame.grid(row=9, pady=10)
 
-      self.help_button = Button(self.help_frame, text="Help / Rules",
+      self.help_button = Button(self.help_export_frame, text="Help / Rules",
                                 font="Arial 15 bold",
-                                bg="#808080", fg="white", command=self.help)
-      self.help_button.grid(row=9)
+                                bg="#808080", fg="white", command=self.help, justify=LEFT)
+      self.help_button.grid(row=9, column=0, padx=10)
+
+      # Make game stats button disabled for first try (no games played). Recycled code from mystery box.
+      self.stats_button = Button(self.help_export_frame, text="Quiz Stats",
+                                  font="Arial 15 bold",
+                                  bg="#003366", fg="white", command = self.to_stats, justify=RIGHT)
+      self.stats_button.grid(row=9, column=1, padx=10)
+
+      # Disable stats button until end of quiz
+      self.stats_button.config(state=DISABLED)
 
       # Quit Button
       self.quit_button = Button(self.quiz_frame, text="Quit", fg="white",
-                                bg="#660000", font="Arial 15 bold", width=20,
+                                bg="#660000", font="Arial 18 bold", width=18,
                                 command=self.to_return, justify= LEFT, padx=5, pady=10)
-      self.quit_button.grid(row=10, pady=20)
+      self.quit_button.grid(row=10, padx=10, pady=20)
       
     # When next button is pushed, check if user input is a string and check / compare to answer
     def check_input(self):
       
+      # Enable stats button
+      self.stats_button.config(state=NORMAL)
+
       # Change the question text when quiz begins
       self.question_line.config(text="What is the note below?")
 
@@ -237,17 +245,9 @@ class Quiz:
           self.quit_button.config(text="Restart", bg="orange", fg="black")
           
         else:
-          # If user chose normal mode, continue quiz01210
-          if user_limit in range(10,51):
-            self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
-            num_incorrect += 1
-            self.incorrect_number.set(num_incorrect)   
-
-          # If user chose infinite mode, end quiz
-          else:
-           # Disable next button
-            self.next_button.config(state=DISABLED)
-            self.next_button.config(text="End of Quiz!")    
+          self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
+          num_incorrect += 1
+          self.incorrect_number.set(num_incorrect)    
 
         # Generate next question after user answers the question
         self.generate_image()
@@ -301,13 +301,34 @@ class Quiz:
       self.photo1_label.config(image=photo)
       self.photo1_label.photo = photo
 
+      # Call & make variable from quiz class
+      correct_answer = self.correct_ans.get()
+
+      # Generate stats summary only if the quiz has begun
+      if number_question >= 2:
+        # Call & make variable from quiz class
+        question_ans_input = self.answer_input.get()
+
+        # Generate quiz summary for game stats if question number is above 1 (during quiz)
+        round_summary = "Musical Note: {} | Your answer: {}".format(correct_answer, question_ans_input)
+
+      else:
+        round_summary = "Quiz begins"
+
+      self.round_stats_list.append(round_summary)
+      
+      ## Testing purposes
+      print(self.round_stats_list)
+
     # Allow users to quit the quiz
     def to_quit(self):
       # Close window
       root.destroy()
 
+    # Allow users to restart quiz when button is pushed
     def to_return(self):
 
+      # Destroy main quiz window
       self.quiz_box.destroy()
 
       # Unwithdraw
@@ -317,14 +338,11 @@ class Quiz:
     def help(self):
       get_help = Help(self)
 
-
-
-    '''# Call variable
-    user_limit = self.limit.get()
-    num_correct = self.correct_number.get()
-    num_incorrect = self.incorrect_number.get()'''
-
-    
+    # Root to go to Quiz stats class
+    def to_stats(self):
+      total_questions = self.limit.get()
+      question_ans_input = self.answer_input.get()
+      QuizStats(self, total_questions, question_ans_input)
 
 # Display help / rules for users
 class Help:
@@ -394,7 +412,7 @@ class Learn:
     "\nEach of those lines and spaces represents a "
     "\ndifferent letter, which in turn represents a note. "
     "\nThe notes are named A-G, and the note sequence "
-    "\nmoves alphabetically up the staff. "
+    "\nmoves alphabetically up the staff."
     "\n"
     "\nSemitones, or half-steps on the keyboard, allow us to "
     "\nwrite with variety of sounds into music. A sharp, denoted "
@@ -418,10 +436,241 @@ class Learn:
                               font="Arial 12 bold", command=partial(self.close_learn, partner))
     self.dismiss_btn.grid(pady=5, padx=15)
 
+  # Close learn window
   def close_learn(self, partner):
       # Put learn button back to normal..
       partner.learn_button.config(state=NORMAL)
       self.learn_box.destroy()
+
+# Create Quiz stats class so that statistics summary of the quiz is given 
+class QuizStats:
+  def __init__(self, partner, total_questions, question_ans_input):
+
+    # Disable stats button
+    partner.stats_button.config(state=DISABLED)
+
+    # Sets up child window (ie: help box)
+    self.stats_box = Toplevel()
+
+    # If users press cross at top, closes help and 'releases' help button
+
+    self.stats_box.protocol('WM_DELETE_WINDOW', partial(self.close_stats, partner))
+
+    # Set up stats Frame
+    self.stats_frame = Frame(self.stats_box)
+    self.stats_frame.grid()
+
+    # Set up Stats heading (row 0)
+    self.stats_heading_label = Label(self.stats_frame, text="Quiz Statistics",
+                                      font="Arial 19 bold")
+    self.stats_heading_label.grid(row=0)
+
+    # To Export <instructions> (row 1)
+    self.export_instructions = Label(self.stats_frame, text="Here are your Quiz Statistics."
+                          "Please use the Export button to "
+                          "access the results of each "
+                          "round that you played", wrap=250,
+                      font="Arial 10 italic",
+                      justify=LEFT, fg="green",
+                      padx=10, pady=10)
+    self.export_instructions.grid(row=1)
+
+    # Export dismiss frame
+    self.export_dismiss_frame = Frame(self.stats_frame)
+    self.export_dismiss_frame.grid(row=3, pady=10)
+
+    # Export Button
+    self.export_button = Button(self.export_dismiss_frame, text="Export",
+                                font="Arial 12 bold",
+                                command=lambda: self.export(total_questions))
+    self.export_button.grid(row=0, column=0)
+
+    # Dismiss button
+    self.dismiss_button = Button(self.export_dismiss_frame, text="Dismiss",
+                                  font="Arial 12 bold",
+                                  command=partial(self.close_stats, partner))
+    self.dismiss_button.grid(row=0, column=1)
+
+    # Number of total questions frame
+    self.details_frame = Frame(self.stats_frame)
+    self.details_frame.grid(row=2)
+
+    # # Number of total questions
+    self.total_questions_label = Label(self.details_frame,text="Total Questions: {}".format(total_questions), font="Arial 12 bold")
+    self.total_questions_label.grid(row=1, column=0, padx=5)
+
+    # # Number of total questions
+    self.ans_input_label = Label(self.details_frame,text="".format(question_ans_input), font="Arial 12 bold")
+    self.ans_input_label.grid(row=2, column=0, padx=5)
+
+    # Correct questions
+    # Incorrect questions
+    # Question / answer
+
+  # Function to lead to export class
+  def export(self, game_history):
+    Export(self, game_history)
+
+  # Allow users to close stats window
+  def close_stats(self, partner):
+    # Put history button back to normal..
+    partner.stats_button.config(state=NORMAL)
+    self.stats_box.destroy()
+
+# Make export class so that users can save quiz stats as file
+class Export:
+  def __init__(self, partner, calc_history):
+
+    background = "#a9ef99"  # Pale green
+
+    # disable export button
+    partner.export_button.config(state=DISABLED)
+
+    # Sets up child window (ie: export box)
+    self.export_box = Toplevel()
+
+    # If users press cross at top, closes export and 'releases' export button
+    self.export_box.protocol('WM_DELETE_WINDOW',
+                              partial(self.close_export, partner))
+
+    # Set up GUI Frame
+    self.export_frame = Frame(self.export_box, width=300, bg=background)
+    self.export_frame.grid()
+
+    # Set up export heading (row 0)
+    self.how_heading = Label(self.export_frame,
+                              text="Export / Instructions",
+                              font="arial 14 bold", bg=background)
+    self.how_heading.grid(row=0)
+
+    # Export Instructions (label, row 1)
+    self.export_text = Label(self.export_frame, text="Enter a filename "
+                                                      "in the box below "
+                                                      "and press Save"
+                                                      "button to save your"
+                                                      "calculation history"
+                                                      "to a text file",
+                              justify=LEFT, width=40,
+                              bg=background, wrap=250)
+    self.export_text.grid(row=1)
+
+    # Warning text (label, row 2)
+    self.export_text = Label(self.export_frame, text="If the filename "
+                                                      "you enter below "
+                                                      "already exists, "
+                                                      "its contents will "
+                                                      "be replaced with "
+                                                      "your calculation "
+                                                      "history",
+                              justify=LEFT, bg="#ffafaf", fg="maroon",
+                              font="Arial 10 italic", wrap=225, padx=10,
+                              pady=10)
+    self.export_text.grid(row=2, pady=10)
+
+    # Filename Entry Box (row 3)
+    self.filename_entry = Entry(self.export_frame, width=20,
+                                font="Arial 14 bold", justify=CENTER)
+    self.filename_entry.grid(row=3, pady=10)
+
+    # Error Message Labels (initially blank, row 4)
+    self.save_error_label = Label(self.export_frame, text="", fg="maroon",
+                                  bg=background)
+    self.save_error_label.grid(row=4)
+
+    # Save / Cancel Frame (row 5)
+    self.save_cancel_frame = Frame(self.export_frame)
+    self.save_cancel_frame.grid(row=5, pady=10)
+
+    # Save and Cancel Buttons (row 0 of save_cancel_frame)
+    self.save_button = Button(self.save_cancel_frame, text="Save",
+                              command=partial(lambda: self.save_history(partner, calc_history)))
+    self.save_button.grid(row=0, column=0)
+
+    self.cancel_button = Button(self.save_cancel_frame, text="Cancel",
+                                command=partial(self.close_export, partner))
+    self.cancel_button.grid(row=0, column=1)
+
+  def save_history(self, partner, calc_history):
+
+    # Regular expression to check filename is valid
+    valid_char = "[A-Za-z0-9_]"
+    has_error = "no"
+
+    filename = self.filename_entry.get()
+    print(filename)
+
+    for letter in filename:
+      if re.match(valid_char, letter):
+        continue
+
+      elif letter == " ":
+        problem = "(no spaces allowed)"
+
+      else:
+        problem = ("(no {}'s allowed)".format(letter))
+        has_error = "yes"
+        break
+
+    if filename == "":
+      problem = "can't be blank"
+      has_error = "yes"
+
+    if has_error == "yes":
+      # Display error message
+      self.save_error_label.config(text="Invalid filename - {}".format(problem))
+      # Change entry box background to pink
+      self.filename_entry.config(bg="#ffafaf")
+      print()
+
+    else:
+      # If there are no errors, generate text file and then close dialogue
+      # add .txt suffix!
+      filename = filename + ".txt"
+
+      # create file to hold data
+      f = open(filename, "w+")
+
+      f.write("Mystery Box\n\n")
+
+      # add new line at end of each item
+      for item in calc_history:
+        f.write(item + "\n" + "\n")
+
+      # close file
+      f.close()
+
+      # close dialogue
+      self.close_export(partner)
+
+  def close_export(self, partner):
+    # Put export button back to normal...
+    partner.export_button.config(state=NORMAL)
+    self.export_button.destroy()
+
+    # History Output goes here.. (row 2)
+
+    # Generate string from list of calculations...
+    export_string = ""
+
+    # Export / Dismiss Button Frame (row 3)
+    self.export_dismiss_frame = Frame(self.export_frame)
+    self.export_dismiss_frame.grid(row=3, pady=10)
+
+    # Export Button
+    self.export_button = Button(self.export_dismiss_frame, text="Export",
+                                font="Arial 12 bold")
+    self.export_button.grid(row=0, column=0)
+
+    # Dismiss button
+    self.dismiss_button = Button(self.export_dismiss_frame, text="Dismiss",
+                                  font="Arial 12 bold",
+                                  command=partial(self.close_export, partner))
+    self.dismiss_button.grid(row=0, column=1)
+
+  def close_export(self, partner):
+    # Put export button back to normal..
+    partner.export_button.config(state=NORMAL)
+    self.export_box.destroy()
 
 # Continue loop
 # main routine
@@ -432,4 +681,9 @@ if __name__ == "__main__":
     s = Start()
     root.mainloop()
 
-  
+
+# Don't have duplicate images showing
+# Make instructions clear
+# Clear user input
+# Bind next to <enter>
+# user input is not correct for the image generated (pushed forward by 1)
