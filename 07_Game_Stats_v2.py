@@ -3,6 +3,10 @@
 # change quit button so that it can go back to the start window
 # Change Correct label into question number label
 
+# References:
+# https://stackoverflow.com/questions/53213550/remove-curly-brackets-from-a-list-of-sets-in-python
+# https://stackoverflow.com/questions/62912728/tkinter-gui-label-from-a-text-file-curly-brackets
+# https://stackoverflow.com/questions/43731784/tkinter-canvas-scrollbar-with-grid
 
 from tkinter import *
 from functools import partial    # To prevent unwanted windows
@@ -110,9 +114,6 @@ class Quiz:
       self.correct_number = IntVar()
       self.correct_number.set(0)
 
-      self.incorrect_number = IntVar()
-      self.incorrect_number.set(0)
-
       self.limit = IntVar()
       self.limit.set(total_questions)
 
@@ -188,6 +189,7 @@ class Quiz:
       self.quit_button.grid(row=10, padx=10, pady=20)
       
     # When next button is pushed, check if user input is a string and check / compare to answer
+    # Reference to Mystery Box project
     def check_input(self):
       
       # Enable stats button
@@ -202,7 +204,6 @@ class Quiz:
       # Call all user input and variables from another class to create other variables
       user_answer = self.answer_input.get().lower()
       num_correct = self.correct_number.get()
-      num_incorrect = self.incorrect_number.get()
       number_question = self.current_number.get()
       correct_answer = self.correct_ans.get().lower()
       user_limit = self.limit.get()
@@ -211,6 +212,7 @@ class Quiz:
       if user_answer in note:
 
         # Increase question number every correct or incorrect answer
+        # Received teacher's suggestion
         number_question += 1
 
         # Reset number_correct when 1 is added
@@ -225,21 +227,31 @@ class Quiz:
           self.mssg.config(text="Correct!", font=("Arial", "12"), fg="green")
           num_correct += 1
           self.correct_number.set(num_correct)
+          
+        # Print incorrect if user answer is not original answer
+        else:
+          self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
 
+        if number_question < user_limit:
+
+          # Create round summary for each question when quiz is continued
+          # Received teacher's suggestion
+          round_summary = "Answer: {} | Your answer: {}\n".format(correct_answer, user_answer)
+
+          # Append and store round summary in round_stats_list 
+          self.round_stats_list.append(round_summary)  
+
+        
         # If the number of questions is equal to the number of questions set at the start, go to end quiz
-        elif number_question >= user_limit:
+        if number_question >= user_limit:
 
           # Disable next button
+          # Received teacher's suggestion
           self.next_button.config(state=DISABLED)
           self.next_button.config(text="End of\nQuiz!")
 
           # Change quit button to restart button
-          self.quit_button.config(text="Restart", bg="orange", fg="black")
-          
-        else:
-          self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
-          num_incorrect += 1
-          self.incorrect_number.set(num_incorrect)    
+          self.quit_button.config(text="Restart", bg="orange", fg="black")  
 
         # Generate next question after user answers the question
         self.generate_image()
@@ -266,6 +278,7 @@ class Quiz:
       # Make a list
       images = []
 
+      # Retrieve variable and make variable
       number_question = self.current_number.get()
 
       # Lead not in the list as that is always 0
@@ -285,20 +298,9 @@ class Quiz:
       self.photo1_label.config(image=photo)
       self.photo1_label.photo = photo
 
-      # Call & make variable from quiz class
-      if number_question >= 2:
-        # Call & make variable from quiz class
-        correct_answer = self.correct_ans.get()
-        question_ans_input = self.answer_input.get()
-
-        # Generate quiz summary for game stats if question number is above 1 (during quiz)
-        round_summary = "Musical Note: {} | Your answer: {}".format(correct_answer, question_ans_input)
-
-        # Append round summary in round stats list
-        self.round_stats_list.append(round_summary)
-      
-        ## Testing purposes
-        print(self.round_stats_list)
+      # Retreive variable and set variable
+      correct_answer = self.correct_ans.get()
+      question_ans_input = self.answer_input.get()
 
     # Allow users to quit the quiz
     def to_quit(self):
@@ -320,9 +322,11 @@ class Quiz:
 
     # Root to go to Quiz stats class
     def to_stats(self):
+
+      # Retrieve variables that needs to be carried to the stats class
       total_questions = self.limit.get()
-      question_ans_input = self.answer_input.get()
-      QuizStats(self, total_questions, question_ans_input)
+      round_stats = self.round_stats_list
+      QuizStats(self, total_questions, round_stats)
 
 # Display help / rules for users
 class Help:
@@ -424,7 +428,7 @@ class Learn:
 
 # Create Quiz stats class so that statistics summary of the quiz is given 
 class QuizStats:
-  def __init__(self, partner, total_questions, question_ans_input):
+  def __init__(self, partner, total_questions, round_stats):
 
     # Disable stats button
     partner.stats_button.config(state=DISABLED)
@@ -437,7 +441,7 @@ class QuizStats:
     self.stats_box.protocol('WM_DELETE_WINDOW', partial(self.close_stats, partner))
 
     # Set up stats Frame
-    self.stats_frame = Frame(self.stats_box)
+    self.stats_frame = Frame(self.stats_box, width=100, height=200)
     self.stats_frame.grid()
 
     # Set up Stats heading (row 0)
@@ -447,45 +451,64 @@ class QuizStats:
 
     # To Export <instructions> (row 1)
     self.export_instructions = Label(self.stats_frame, text="Here are your Quiz Statistics."
-                          "Please use the Export button to "
-                          "access the results of each "
-                          "round that you played", wrap=250,
+                          " Please use the ‘Export’ button to generate a text file showing your quiz statistics.", wrap=250,
                       font="Arial 10 italic",
                       justify=LEFT, fg="green",
                       padx=10, pady=10)
     self.export_instructions.grid(row=1)
 
+    # Set frame for total questions and number of questions correct
+    self.details_frame = Frame(self.stats_frame)
+    self.details_frame.grid(row=2)
+    
+    # Number of total questions
+    self.total_questions_label = Label(self.details_frame,text="Total Questions: {}\n".format(total_questions), font="Arial 12 bold")
+    self.total_questions_label.grid(row=1, column=0, padx=5)
+    
+    # Number of correct questions
+
+    # Set frame for quiz summary
+    self.summary_frame = Frame(self.stats_frame)
+    self.summary_frame.grid(row=3)
+
+    # Add a canvas in that frame
+    canvas = Canvas(self.summary_frame)
+    canvas.grid(row=3, column=0, sticky="news")
+    
+    # Create scroll bar
+    # Link a scrollbar to the canvas
+    # Reference: https://stackoverflow.com/questions/43731784/tkinter-canvas-scrollbar-with-grid
+    scroll_bar = Scrollbar(self.summary_frame, orient="vertical", command=canvas.yview)
+    scroll_bar.grid(row=3, column=1, sticky='ns')
+    canvas.configure(yscrollcommand=scroll_bar.set)
+
+    # Summary heading
+    self.summary_heading = Label(self.summary_frame,text="--- Quiz Summary ---", font="Arial 12 bold")
+    self.summary_heading.grid(row=2, column=0, padx=5)
+
+    # Round sats label (Answer | User input)
+    # Reference: https://stackoverflow.com/questions/62912728/tkinter-gui-label-from-a-text-file-curly-brackets
+    self.ans_input_label = Label(self.summary_frame,text="".join(round_stats), font="Arial 12 bold")
+    self.ans_input_label.grid(row=3, column=0, padx=5)
+
     # Export dismiss frame
     self.export_dismiss_frame = Frame(self.stats_frame)
-    self.export_dismiss_frame.grid(row=3, pady=10)
+    self.export_dismiss_frame.grid(row=4, pady=10)
 
     # Export Button
     self.export_button = Button(self.export_dismiss_frame, text="Export",
                                 font="Arial 12 bold",
-                                command=lambda: self.export(total_questions))
-    self.export_button.grid(row=0, column=0)
+                                command=lambda: self.export(total_questions, round_stats))
+    self.export_button.grid(row=4, column=0)
 
     # Dismiss button
     self.dismiss_button = Button(self.export_dismiss_frame, text="Dismiss",
                                   font="Arial 12 bold",
                                   command=partial(self.close_stats, partner))
-    self.dismiss_button.grid(row=0, column=1)
+    self.dismiss_button.grid(row=4, column=1)
 
-    # Number of total questions frame
-    self.details_frame = Frame(self.stats_frame)
-    self.details_frame.grid(row=2)
-
-    # # Number of total questions
-    self.total_questions_label = Label(self.details_frame,text="Total Questions: {}".format(total_questions), font="Arial 12 bold")
-    self.total_questions_label.grid(row=1, column=0, padx=5)
-
-    # # Number of total questions
-    self.ans_input_label = Label(self.details_frame,text="".format(question_ans_input), font="Arial 12 bold")
-    self.ans_input_label.grid(row=2, column=0, padx=5)
-
-    # Correct questions
-    # Incorrect questions
-    # Question / answer
+    # Set the canvas scrolling region
+    canvas.config(scrollregion=(-5, 5))
 
   # Function to lead to export class
   def export(self, game_history):
@@ -493,7 +516,7 @@ class QuizStats:
 
   # Allow users to close stats window
   def close_stats(self, partner):
-    # Put history button back to normal..
+    # Put stats button back to normal
     partner.stats_button.config(state=NORMAL)
     self.stats_box.destroy()
 
@@ -667,3 +690,4 @@ if __name__ == "__main__":
 # Clear user input
 # Bind next to <enter>
 # user input is not correct for the image generated (pushed forward by 1)
+# Go back to scrolling issue (canvas size needs to be fixed)
