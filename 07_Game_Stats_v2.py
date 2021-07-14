@@ -22,17 +22,20 @@ class Start:
   def __init__(self):
 
     # GUI to get starting question and mode
-    self.start_frame = Frame(padx=10, pady=10)
-    self.start_frame.grid()
+    self.start_frame = Frame()
+    self.start_frame.grid(padx=10, pady=10)
     
     # Start up intro 
-    start_intro = Label(self.start_frame, text="Welcome to Guess the Note! "
-    "\n"
-                                    "\nWrite the number of questions "
+    start_intro = Label(self.start_frame, text="Welcome to...", font=("Arial 14 bold"))
+    start_intro.grid(pady=5)
+
+    Title = Label(self.start_frame, text="Guess the Note! ", font=("Arial 22 bold"), fg="blue")
+    Title.grid(pady=0)
+
+    Instructions = Label(self.start_frame, text="\nWrite the number of questions "
                                     "\nyou want and press <Start> to "
-                                    "\nto begin!",
-                                      font=("Arial", "11"))
-    start_intro.grid(pady=15)
+                                    "\nto begin!", font=("Arial 11"))
+    Instructions.grid(pady=5)
 
     # Allow user to input the number of questions they want
     self.total_questions = Entry(self.start_frame)
@@ -49,7 +52,7 @@ class Start:
     self.total_question_label.grid(row=4, pady=10)
 
     self.answer = Label(self.start_frame, text='')
-    self.answer.grid(row=6, pady=20)
+    self.answer.grid(row=6, pady=10)
     
     # Start button
     self.start_button = Button(self.start_frame, text="Start", font="Cabin 20 bold", bg="yellow", 
@@ -321,7 +324,6 @@ class Quiz:
     def to_quit(self):
       # Close window
       root.destroy()
-      self.stats_box.destroy()
 
     # Allow users to restart quiz when button is pushed
     def to_return(self):
@@ -331,7 +333,6 @@ class Quiz:
 
       # Unwithdraw
       root.deiconify()
-      self.stats_box.destroy()
 
     # Root to go to help class
     def help(self):
@@ -367,20 +368,21 @@ class Help:
 
     self.how_heading = Label(self.help_frame, text="Help / Instructions",
                               font="Arial 14 bold")
-    self.how_heading.grid(row=0)
+    self.how_heading.grid(row=0, pady=10)
 
-    help_text="Help / Rules goes here..."
+    # Insert help / rules / instructions text in help window
+    help_text="1. Look at the image and guess the note.\n\nThe note on the lowest line is E and they move\n alphabetically up the staff.\n\n2. Enter a single letter (e.g. c) in english.\nMusical notes are c, d, e, f, g, a, b.\n\n3. The <Quiz Stats> button will be enabled when\nyou have completed 10 questions. It shows you\n your quiz results and allows you to export it into\na text file.\n\n4. The <quit> button will restart the quiz.\n\n5. Enjoy the quiz!\n\n"
 
     # Help text (label, row 1)
     self.help_text = Label(self.help_frame, text=help_text,
-                            justify=LEFT, wrap=400, padx=10, pady=10)
+                            justify=LEFT, wrap=400, padx=10)
     self.help_text.grid(row=1)
 
     # Dismiss button (row 2)
     self.dismiss_btn = Button(self.help_frame, text="Dismiss",
                               width=10, bg="#660000", fg="white",
-                              font="Arial 15 bold", command=partial(self.close_help, partner))
-    self.dismiss_btn.grid(row=3, column=0)
+                              font="Arial 16 bold", command=partial(self.close_help, partner))
+    self.dismiss_btn.grid(row=3, column=0, pady=10)
 
   def close_help(self, partner):
     # Put help button back to normal..
@@ -464,14 +466,11 @@ class QuizStats:
     # Set up Stats heading (row 0)
     self.stats_heading_label = Label(self.stats_frame, text="Quiz Statistics",
                                       font="Arial 19 bold")
-    self.stats_heading_label.grid(row=0)
+    self.stats_heading_label.grid(row=0, pady=10)
 
     # To Export <instructions> (row 1)
     self.export_instructions = Label(self.stats_frame, text="Here are your Quiz Statistics."
-                          " Please use the ‘Export’ button to generate a text file showing your quiz statistics.", wrap=250,
-                      font="Arial 10 italic",
-                      justify=LEFT, fg="green",
-                      padx=10, pady=10)
+                          " Please use the ‘Export’ button to generate a text file showing your quiz statistics.", wrap=250, font="Arial 10 italic", fg="green", padx=10, pady=10)
     self.export_instructions.grid(row=1)
 
     # Set frame for total questions and number of questions correct
@@ -525,17 +524,17 @@ class QuizStats:
 
     # Export dismiss frame
     self.export_dismiss_frame = Frame(self.stats_frame)
-    self.export_dismiss_frame.grid(row=6, pady=10)
+    self.export_dismiss_frame.grid(row=6, pady=15, padx=15)
 
     # Export Button
     self.export_button = Button(self.export_dismiss_frame, text="Export",
-                                font="Arial 12 bold", bg="green", fg="white",command=lambda: self.export(total_questions, correct_num, round_stats))
-    self.export_button.grid(row=6, column=0)
+                                font="Arial 14 bold", bg="#003366", fg="white", padx=15, command=lambda: self.export(total_questions, correct_num, round_stats))
+    self.export_button.grid(row=6, column=0, padx=5)
 
     # Dismiss button
     self.dismiss_button = Button(self.export_dismiss_frame, text="Dismiss",
-                                  font="Arial 12 bold", bg="#660000", fg="white", command=partial(self.close_stats, partner))
-    self.dismiss_button.grid(row=6, column=1)
+                                  font="Arial 14 bold", bg="#660000", fg="white", padx=15, command=partial(self.close_stats, partner))
+    self.dismiss_button.grid(row=6, column=1, padx=5)
 
   # Bind mousewheel to scroll bar
   def on_mousewheel(self, partner):
