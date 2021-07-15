@@ -38,7 +38,10 @@ class Start:
     Instructions.grid(pady=5)
 
     # Allow user to input the number of questions they want
-    self.total_questions = Entry(self.start_frame)
+    self.total_questions = Entry(self.start_frame, validate='key')
+    # Bind next button to <enter> key
+    # Reference: Mystery Box project
+    self.total_questions.bind('<Return>', lambda _: self.int_check())
     self.total_questions.grid(row=5, pady=10)
 
     # Set total questions as 0
@@ -155,9 +158,12 @@ class Quiz:
       self.input_frame.grid(row=6, pady=10)
 
       # Entry box for users to enter their answer
-      self.answer_input = Entry(self.input_frame)
+      # 
+      self.answer_input = Entry(self.input_frame, validate='key')
+      # Bind next button to <enter> key
+      # Reference: Mystery Box project (& teacher's advice)
+      self.answer_input.bind('<Return>', lambda _: self.check_input())
       self.answer_input.grid(row=4, column=0, padx=5)
-      self.answer_input.focus_set()
 
       # Function code reference to Mystery Box project
       # Make program generate a random image of a musical note
@@ -167,10 +173,6 @@ class Quiz:
       self.next_button = Button(self.input_frame, text="Next",
                                   font="Arial 14 bold",
                                   bg="light blue", fg="black", command=self.check_input, justify=RIGHT)
-                                  
-      # Bind next button to <enter> key
-      # Reference: Mystery Box project
-      self.next_button.bind('<Return>', lambda _: self.check_input)
       self.next_button.grid(row=4, column=1)
 
       # Make space for message shown about user input
@@ -265,7 +267,7 @@ class Quiz:
 
           # Disable next button
           # Received teacher's suggestion
-          self.next_button.config(text="End of\nQuiz!")
+          self.next_button.config(text="End of\nQuiz!", state=DISABLED)
 
           # Change quit button to restart button
           self.quit_button.config(text="Restart", bg="orange", fg="black")  
@@ -351,8 +353,9 @@ class Quiz:
 class Help:
   def __init__(self, partner):
 
-    # Disable help button
+    # Disable help and quit button
     partner.help_button.config(state=DISABLED)
+    partner.quit_button.config(state=DISABLED)
 
     # Sets up child window (ie: help box)
     self.help_box = Toplevel()
@@ -385,8 +388,9 @@ class Help:
     self.dismiss_btn.grid(row=3, column=0, pady=10)
 
   def close_help(self, partner):
-    # Put help button back to normal..
+    # Put help and quit button back to normal..
     partner.help_button.config(state=NORMAL)
+    partner.quit_button.config(state=NORMAL)
     self.help_box.destroy()
 
 # Learn window / class
@@ -450,8 +454,9 @@ class Learn:
 class QuizStats:
   def __init__(self, partner, total_questions, round_stats, correct_num):
 
-    # Disable stats button
+    # Disable stats and quit button
     partner.stats_button.config(state=DISABLED)
+    partner.quit_button.config(state=DISABLED)
 
     # Sets up child window (ie: help box)
     self.stats_box = Toplevel()
@@ -546,8 +551,9 @@ class QuizStats:
 
   # Allow users to close stats window
   def close_stats(self, partner):
-    # Put stats button back to normal
+    # Put stats and quit button back to normal
     partner.stats_button.config(state=NORMAL)
+    partner.quit_button.config(state=NORMAL)
     self.stats_box.destroy()
 
 # Make export class so that users can save quiz stats as file
