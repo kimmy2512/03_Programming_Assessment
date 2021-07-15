@@ -12,6 +12,7 @@
 # https://stackoverflow.com/questions/49279580/adjust-scrollbar-height-in-tkinter
 # https://stackoverflow.com/questions/54796453/python-tkinter-clearing-label-text
 # https://stackoverflow.com/questions/11160939/writing-integer-values-to-a-file-using-out-write
+# https://stackoverflow.com/questions/29805042/python-avoid-previous-value-from-random-selection-from-list
 
 from tkinter import *
 from functools import partial    # To prevent unwanted windows
@@ -23,22 +24,22 @@ class Start:
 
     # GUI to get starting question and mode
     self.start_frame = Frame()
-    self.start_frame.grid(padx=10, pady=10)
+    self.start_frame.grid(padx=10, pady=15)
     
     # Start up intro 
     start_intro = Label(self.start_frame, text="Welcome to...", font=("Arial 14 bold"))
-    start_intro.grid(pady=5)
+    start_intro.grid(pady=0)
 
     Title = Label(self.start_frame, text="Guess the Note! ", font=("Arial 22 bold"), fg="blue")
     Title.grid(pady=0)
 
-    Instructions = Label(self.start_frame, text="\nWrite the number of questions "
-                                    "\nyou want and press <Start> to "
+    Instructions = Label(self.start_frame, text="\nEnter the number of questions "
+                                    "\nyou want for the quiz. Press <Start> "
                                     "\nto begin!", font=("Arial 11"))
-    Instructions.grid(pady=5)
+    Instructions.grid(pady=15)
 
     # Allow user to input the number of questions they want
-    self.total_questions = Entry(self.start_frame, validate='key')
+    self.total_questions = Entry(self.start_frame, font="Arial 12", validate='key')
     # Bind next button to <enter> key
     # Reference: Mystery Box project
     self.total_questions.bind('<Return>', lambda _: self.int_check())
@@ -52,7 +53,7 @@ class Start:
     self.total_question_label = Label(self.start_frame, font="Arial 12 bold", fg="green",
                                 text="How many questions do you want (between 10 - 50): ?", wrap=300,
                                 justify=LEFT)
-    self.total_question_label.grid(row=4, pady=10)
+    self.total_question_label.grid(row=4, pady=5)
 
     self.answer = Label(self.start_frame, text='')
     self.answer.grid(row=6, pady=10)
@@ -151,7 +152,7 @@ class Quiz:
       number_question = self.current_number.get()
     
       # Display question text everytime random image is generated
-      self.question_line = Label(self.quiz_frame, text="Click <Next> to begin the quiz", font="Arial 12")
+      self.question_line = Label(self.quiz_frame, text="What is the note below?", font="Arial 14")
       self.question_line.grid(row=1, pady=10)
       
       self.input_frame = Frame(self.quiz_frame)
@@ -159,7 +160,7 @@ class Quiz:
 
       # Entry box for users to enter their answer
       # 
-      self.answer_input = Entry(self.input_frame, validate='key')
+      self.answer_input = Entry(self.input_frame, font="Arial 12", validate='key')
       # Bind next button to <enter> key
       # Reference: Mystery Box project (& teacher's advice)
       self.answer_input.bind('<Return>', lambda _: self.check_input())
@@ -214,9 +215,6 @@ class Quiz:
     # Reference to Mystery Box project
     def check_input(self):
 
-      # Change the question text when quiz begins
-      self.question_line.config(text="What is the note below?")
-
       # Create a list for notes
       note = ["c", "d", "e", "f", "g", "a", "b"] 
 
@@ -234,7 +232,7 @@ class Quiz:
         # Received teacher's suggestion
         number_question += 1
 
-        # Reset number_correct when 1 is added
+        # Set number_correct when 1 is added
         self.current_number.set(number_question)
 
         # Set question label
@@ -263,11 +261,28 @@ class Quiz:
           self.round_stats_list.append(round_summary) 
 
         # If the number of questions is equal to the number of questions set at the start, go to end quiz
-        if number_question >= user_limit:
+        if number_question > user_limit:
+          number_question -= 1
 
-          # Disable next button
+          # Set number_correct when 1 is added
+          self.current_number.set(number_question)
+
+          # Set question number
+          self.current_label.config(text="Question: {}".format(number_question))
+          
+          # Delete user input
+          # Reference from teacher's Math Demo Quiz
+          self.answer_input.delete(0, END)
+          self.answer_input.config(bg="white")
+
+          # Disable next button, question, & answer input
           # Received teacher's suggestion
           self.next_button.config(text="End of\nQuiz!", state=DISABLED)
+          self.question_line.config(state=DISABLED)
+          self.answer_input.config(state=DISABLED)
+
+          # Print ending message
+          self.mssg.config(text="Well Done! You got {} out of {}!".format(num_correct, number_question), font=("Arial", "12"), fg="blue")
 
           # Change quit button to restart button
           self.quit_button.config(text="Restart", bg="orange", fg="black")  
@@ -294,18 +309,17 @@ class Quiz:
       # Reference from teacher's Math Demo Quiz
       self.answer_input.delete(0, END)
       self.answer_input.focus()
-      
-      # Make a list
-      images = []
-
-      # Retrieve variable and make variable
-      number_question = self.current_number.get()
 
       # Lead not in the list as that is always 0
       octave_list = ["C_150.gif", "D_150.gif", "E_150.gif", "F_150.gif", "G_150.gif", "A_150.gif", "B_150.gif", "C2_150.gif", "D2_150.gif", "E2_150.gif", "F2_150.gif", "G2_150.gif", "A2_150.gif", "B2_150.gif"]
+      # previous_octave = None
 
       # Random images in the list is the first and second octave
+      # Reference: https://stackoverflow.com/questions/29805042/python-avoid-previous-value-from-random-selection-from-list
       octave = random.choice(octave_list)
+      # if octave != previous_octave:
+      #   yield octave
+      #   previous_octave = octave
 
       question_image = "Programming_images/" + octave
       photo = PhotoImage(file=question_image)
@@ -317,10 +331,6 @@ class Quiz:
       # Display prizes & edit background...
       self.photo1_label.config(image=photo)
       self.photo1_label.photo = photo
-
-      # Retreive variable and set variable
-      correct_answer = self.correct_ans.get()
-      question_ans_input = self.answer_input.get()
 
     # Allow users to quit the quiz
     def to_quit(self):
@@ -374,7 +384,7 @@ class Help:
     self.how_heading.grid(row=0, pady=10)
 
     # Insert help / rules / instructions text in help window
-    help_text="1. Look at the image and guess the note.\n\nThe note on the lowest line is E and they move\n alphabetically up the staff.\n\n2. Enter a single letter (e.g. c) in english.\nMusical notes are c, d, e, f, g, a, b.\n\n3. The <Quiz Stats> button will be enabled when\nyou have completed 10 questions. It shows you\n your quiz results and allows you to export it into\na text file.\n\n4. The <quit> button will restart the quiz.\n\n5. Enjoy the quiz!\n\n"
+    help_text="1. Look at the image and guess the note.\n\nThe note on the lowest line is E and they move\nalphabetically up the staff. Each line and space\nconsists of a musical note.\n\n2. Enter a single letter (e.g. c) in english.\nMusical notes are c, d, e, f, g, a, b.\n\n3. The <Quiz Stats> button will be enabled when\nyou have completed 10 questions. It shows you\n your quiz results and allows you to export it into\na text file.\n\n4. The <quit> button will restart the quiz.\n\n5. Enjoy the quiz!\n\n"
 
     # Help text (label, row 1)
     self.help_text = Label(self.help_frame, text=help_text,
@@ -422,16 +432,11 @@ class Learn:
     "\nThe notes are named A-G, and the note sequence "
     "\nmoves alphabetically up the staff."
     "\n"
-    "\nSemitones, or half-steps on the keyboard, allow us to "
-    "\nwrite with variety of sounds into music. A sharp, denoted "
-    "\nby the ♯ symbol, means that note is a semitone (or half "
-    "\nstep) higher than the note head to its right on sheet "
-    "\nmusic. Conversely, a flat, denoted by a ♭ symbol, "
-    "\nmeans the note is a semitone lower than the note "
-    "\nhead to its right. "
+    "\n* Make sure to write the notes in letters."
+    "\n  E.g. c, d, e, f, g, a, b"
     "\n"
-    "\n* Make sure to use words when indicating semitones. "
-    "\nE.g. c flat")
+    "\n** Note that this quiz is for beginners of music,"
+    "\n   as it only consists of two octaves from c.")
 
     # Learn text (label, row 1)
     self.learn_text = Label(self.learn_frame, text=learn_text,
@@ -585,22 +590,20 @@ class Export:
     # Export Instructions (label, row 1)
     self.export_text = Label(self.export_frame, text="Enter a filename "
                                                       "in the box below "
-                                                      "and press Save"
-                                                      "button to save your"
-                                                      "calculation history"
-                                                      "to a text file",
+                                                      "and press <save>. "
+                                                      "This saves your "
+                                                      "quiz summary into "
+                                                      "a text file.",
                               justify=LEFT, width=40,
                               bg=background, wrap=250)
     self.export_text.grid(row=1)
 
     # Warning text (label, row 2)
     self.export_text = Label(self.export_frame, text="If the filename "
-                                                      "you enter below "
                                                       "already exists, "
                                                       "its contents will "
                                                       "be replaced with "
-                                                      "your calculation "
-                                                      "history",
+                                                      "your quiz summary ",
                               justify=LEFT, bg="#ffafaf", fg="maroon",
                               font="Arial 10 italic", wrap=225, padx=10,
                               pady=10)
