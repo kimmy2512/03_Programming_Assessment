@@ -299,11 +299,7 @@ class Quiz:
       # previous_octave = None
 
       # Random images in the list is the first and second octave
-      # Reference: https://stackoverflow.com/questions/29805042/python-avoid-previous-value-from-random-selection-from-list
       octave = random.choice(octave_list)
-      # if octave != previous_octave:
-      #   yield octave
-      #   previous_octave = octave
 
       question_image = "Programming_images/" + octave
       photo = PhotoImage(file=question_image)
