@@ -32,10 +32,7 @@ class Quiz:
   def __init__(self):
 
     self.initial_question = IntVar()
-    initial = 0
-
-    # Set starting balance to amount entered by user at start of game
-    self.initial_question.set(initial)
+    self.initial_question.set(1)
 
     # GUI setup
     self.quiz_box = Toplevel()
@@ -52,13 +49,12 @@ class Quiz:
     question_frame = Frame(self.quiz_frame)
     question_frame.grid(row=1)
 
-    question_label = Label(self.quiz_frame, text="Question: ")
-    question_label.grid(row=2)
+    self.question_label = Label(self.quiz_frame, text="Level: 1", font="Arial 12")
+    self.question_label.grid(row=2, pady=10)
 
     # Button to go to next question
-    quiz_button = Button(self.quiz_frame, text="Next Question",
-                              padx=10, pady=10, command=self.add_questions)
-    quiz_button.grid(row=3)
+    self.quiz_button = Button(self.quiz_frame, text="Next Question", font="Arial 12 bold", padx=10, pady=10, command=self.add_questions)
+    self.quiz_button.grid(row=3, pady=10, padx=10) 
 
   # Function to add up number of questions
   def add_questions(self):
@@ -71,7 +67,7 @@ class Quiz:
     self.initial_question.set(question_number)
 
     # Print out & display the number of question
-    self.question_label.configure(text="Question: {}".format(self.initial_question))
+    self.question_label.config(text="Level: {}".format(question_number))
 
 
 # main routine

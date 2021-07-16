@@ -1,11 +1,3 @@
-# To Do list: 
-# Clear entry widget when next button is pushed
-# Create working Quiz stats and export class
-# Create scroll bar for quiz summary
-# Bind <enter key> to next and start button
-# Make instructions clear
-# Enable stats button only when question number is greater or equal to 10
-
 from tkinter import *
 from functools import partial    # To prevent unwanted windows
 import random   
@@ -19,19 +11,19 @@ class Start:
     self.start_frame.grid(padx=10, pady=15)
     
     # Start up intro 
-    start_intro = Label(self.start_frame, text="Welcome to...", font=("Arial 14 bold"))
+    start_intro = Label(self.start_frame, text="Welcome to...", font=("Cabin 14 bold"))
     start_intro.grid(pady=0)
 
-    Title = Label(self.start_frame, text="Guess the Note! ", font=("Arial 22 bold"), fg="blue")
+    Title = Label(self.start_frame, text="Guess the Note! ", font=("Cabin 22 bold"), fg="#00509d")
     Title.grid(pady=0)
 
     Instructions = Label(self.start_frame, text="\nEnter the number of questions "
                                     "\nyou want for the quiz. Press <Start> "
-                                    "\nto begin!", font=("Arial 11"))
+                                    "\nto begin!", font=("Cabin 11"))
     Instructions.grid(pady=15)
 
     # Allow user to input the number of questions they want
-    self.total_questions = Entry(self.start_frame, font="Arial 12", validate='key')
+    self.total_questions = Entry(self.start_frame, font="Cabin 12", validate='key')
     # Bind next button to <enter> key
     # Reference: Mystery Box project
     self.total_questions.bind('<Return>', lambda _: self.int_check())
@@ -42,7 +34,7 @@ class Start:
     total_questions.set(0)
 
     # Ask how many questions user want            
-    self.total_question_label = Label(self.start_frame, font="Arial 12 bold", fg="green",
+    self.total_question_label = Label(self.start_frame, font="Cabin 12 bold", fg="#155d27",
                                 text="How many questions do you want (between 10 - 50): ?", wrap=300,
                                 justify=LEFT)
     self.total_question_label.grid(row=4, pady=5)
@@ -51,13 +43,13 @@ class Start:
     self.answer.grid(row=6, pady=10)
     
     # Start button
-    self.start_button = Button(self.start_frame, text="Start", font="Cabin 20 bold", bg="yellow", 
-                                fg="black", padx=20, pady=10, command=self.int_check)
+    self.start_button = Button(self.start_frame, text="Start", font="Cabin 25 bold", bg="#ffea00", 
+                                fg="black", padx=25, pady=10, command=self.int_check)
     self.start_button.grid(pady=5, padx=10)
     
     # Learn Button (row 1)
-    self.learn_button = Button(self.start_frame, text="Learn", font=("Arial", "14"), 
-                                bg="light green", fg="black", padx=10, pady=5, 
+    self.learn_button = Button(self.start_frame, text="Learn", font=("Cabin", "16"), 
+                                bg="#ff70a6", fg="black", padx=10, pady=5, 
                                 command=self.learn) 
     self.learn_button.grid(pady=10, padx=15)
     
@@ -71,7 +63,7 @@ class Start:
       if total_questions not in range(10, 51):
         self.answer.config(text="Out of range. Please enter " 
                                 "\nan integer between 10 and 50", 
-                                font=("Arial", "12"), fg="red")
+                                font=("Cabin", "12"), fg="red")
         return False
       
       else:
@@ -91,7 +83,7 @@ class Start:
     # Give error message if user input is not an integer between 10 and 50
     except ValueError:
       self.answer.config(text="Please enter an integer "
-                          "\nbetween 10 and 50", font=("Arial", "12"), fg="red")
+                          "\nbetween 10 and 50", font=("Cabin", "12"), fg="red")
     
 # Button that displays appropriate information by a new window
   def learn(self):
@@ -144,7 +136,7 @@ class Quiz:
       number_question = self.current_number.get()
     
       # Display question text everytime random image is generated
-      self.question_line = Label(self.quiz_frame, text="What is the note below?", font="Arial 14")
+      self.question_line = Label(self.quiz_frame, text="What is the note below?", font="cabin 14")
       self.question_line.grid(row=1, pady=10)
       
       self.input_frame = Frame(self.quiz_frame)
@@ -152,7 +144,7 @@ class Quiz:
 
       # Entry box for users to enter their answer
       # 
-      self.answer_input = Entry(self.input_frame, font="Arial 12", validate='key')
+      self.answer_input = Entry(self.input_frame, font="cabin 12", validate='key')
       # Bind next button to <enter> key
       # Reference: Mystery Box project (& teacher's advice)
       self.answer_input.bind('<Return>', lambda _: self.check_input())
@@ -164,7 +156,7 @@ class Quiz:
 
       # Create a next button so that when it is pushed, another image randomly generates
       self.next_button = Button(self.input_frame, text="Next",
-                                  font="Arial 14 bold",
+                                  font="cabin 14 bold",
                                   bg="light blue", fg="black", command=self.check_input, justify=RIGHT)
       self.next_button.grid(row=4, column=1)
 
@@ -177,7 +169,7 @@ class Quiz:
       self.feedback_frame.grid(row=8)
 
       # Make current question label
-      self.current_label = Label(self.feedback_frame, font="Arial 11 bold", text="Question: 1", justify=LEFT)
+      self.current_label = Label(self.feedback_frame, font="Cabin 11 bold", text="Question: 1", justify=LEFT)
       self.current_label.grid(row=8, column=0, padx=5)    
 
       # Help and quiz stats button (row 5)
@@ -185,13 +177,13 @@ class Quiz:
       self.help_export_frame.grid(row=9, pady=10)
 
       self.help_button = Button(self.help_export_frame, text="Help / Rules",
-                                font="Arial 15 bold",
+                                font="Cabin 15 bold",
                                 bg="#808080", fg="white", command=self.help, justify=LEFT)
       self.help_button.grid(row=9, column=0, padx=10)
 
       # Make game stats button disabled for first try (no games played). Recycled code from mystery box.
       self.stats_button = Button(self.help_export_frame, text="Quiz Stats",
-                                  font="Arial 15 bold",
+                                  font="Cabin 15 bold",
                                   bg="#003366", fg="white", command = self.to_stats, justify=RIGHT)
       self.stats_button.grid(row=9, column=1, padx=10)
 
@@ -199,7 +191,7 @@ class Quiz:
 
       # Quit Button
       self.quit_button = Button(self.quiz_frame, text="Quit", fg="white",
-                                bg="#660000", font="Arial 18 bold", width=18,
+                                bg="#660000", font="Cabin 18 bold", width=18,
                                 command=self.to_return, justify= LEFT, padx=5, pady=10)
       self.quit_button.grid(row=10, padx=10, pady=20)
       
@@ -233,14 +225,14 @@ class Quiz:
 
         # Begin checking user answer by comparing it to the original answer - print correct or incorrect
         if user_answer == correct_answer:
-          self.mssg.config(text="Correct!", font=("Arial", "12"), fg="green")
+          self.mssg.config(text="Correct!", font=("Cabin", "12"), fg="green")
           num_correct += 1
           self.correct_number.set(num_correct)
           self.answer_input.config(bg="pale green")
           
         # Print incorrect if user answer is not original answer
         else:
-          self.mssg.config(text="Incorrect", font=("Arial", "12"), fg="red")
+          self.mssg.config(text="Incorrect", font=("Cabin", "12"), fg="red")
           self.answer_input.config(bg="pink")
 
         if number_question < user_limit:
@@ -274,7 +266,7 @@ class Quiz:
           self.answer_input.config(state=DISABLED)
 
           # Print ending message
-          self.mssg.config(text="Well Done! You got {} out of {}!".format(num_correct, number_question), font=("Arial", "12"), fg="blue")
+          self.mssg.config(text="Well Done! You got {} out of {}!".format(num_correct, number_question), font=("Cabin", "12"), fg="blue")
 
           # Change quit button to restart button
           self.quit_button.config(text="Restart", bg="orange", fg="black")  
@@ -285,7 +277,7 @@ class Quiz:
       # Print error message if user input is not a letter (float or int)
       else:
         self.mssg.config(text="Please enter a letter "
-                          "\nof a musical note", font=("Arial", "12"), fg="red")
+                          "\nof a musical note", font=("Cabin", "12"), fg="red")
 
         return False
       
@@ -373,7 +365,7 @@ class Help:
     # Set up Help heading (row 0)
 
     self.how_heading = Label(self.help_frame, text="Help / Instructions",
-                              font="Arial 14 bold")
+                              font="Cabin 14 bold")
     self.how_heading.grid(row=0, pady=10)
 
     # Insert help / rules / instructions text in help window
@@ -387,7 +379,7 @@ class Help:
     # Dismiss button (row 2)
     self.dismiss_btn = Button(self.help_frame, text="Dismiss",
                               width=10, bg="#660000", fg="white",
-                              font="Arial 16 bold", command=partial(self.close_help, partner))
+                              font="Cabin 16 bold", command=partial(self.close_help, partner))
     self.dismiss_btn.grid(row=3, column=0, pady=10)
 
   def close_help(self, partner):
@@ -417,7 +409,7 @@ class Learn:
     # Set up Learn heading (row 0)
 
     self.how_heading = Label(self.learn_frame, text="Learn",
-                              font="Arial 17 bold")
+                              font="Cabin 17 bold")
     self.how_heading.grid(row=0)
 
     learn_text=("The staff consists of five lines and four spaces. "
@@ -440,7 +432,7 @@ class Learn:
     # Dismiss button (row 2)
     self.dismiss_btn = Button(self.learn_frame, text="Dismiss",
                               width=7, bg="#660000", fg="white",
-                              font="Arial 12 bold", command=partial(self.close_learn, partner))
+                              font="Cabin 12 bold", command=partial(self.close_learn, partner))
     self.dismiss_btn.grid(pady=5, padx=15)
 
   # Close learn window
@@ -470,12 +462,12 @@ class QuizStats:
 
     # Set up Stats heading (row 0)
     self.stats_heading_label = Label(self.stats_frame, text="Quiz Statistics",
-                                      font="Arial 19 bold")
+                                      font="Cabin 19 bold")
     self.stats_heading_label.grid(row=0, pady=10)
 
     # To Export <instructions> (row 1)
     self.export_instructions = Label(self.stats_frame, text="Here are your Quiz Statistics."
-                          " Please use the ‘Export’ button to generate a text file showing your quiz statistics.", wrap=250, font="Arial 10 italic", fg="green", padx=10, pady=10)
+                          " Please use the ‘Export’ button to generate a text file showing your quiz statistics.", wrap=250, font="Cabin 10 italic", fg="green", padx=10, pady=10)
     self.export_instructions.grid(row=1)
 
     # Set frame for total questions and number of questions correct
@@ -483,11 +475,11 @@ class QuizStats:
     self.details_frame.grid(row=2)
     
     # Number of total questions
-    self.total_questions_label = Label(self.details_frame,text="Total Questions: {}".format(total_questions), font="Arial 12 bold")
+    self.total_questions_label = Label(self.details_frame,text="Total Questions: {}".format(total_questions), font="Cabin 12 bold")
     self.total_questions_label.grid(row=1, column=0, padx=5)
     
     # Display number of questions correct 
-    self.correct_label = Label(self.details_frame, font="Arial 12 bold", text="Questions correct: {}\n".format(correct_num))
+    self.correct_label = Label(self.details_frame, font="Cabin 12 bold", text="Questions correct: {}\n".format(correct_num))
     self.correct_label.grid(row=2, column=0, padx=5)
 
     # Add a canvas in that frame
@@ -518,13 +510,13 @@ class QuizStats:
     self.canvas.configure(yscrollcommand=scroll_bar.set)
 
     # Summary heading
-    self.summary_heading = Label(self.stats_frame, text="--- Quiz Summary ---", font="Arial 12 bold")
+    self.summary_heading = Label(self.stats_frame, text="--- Quiz Summary ---", font="Cabin 12 bold")
     self.summary_heading.grid(row=3, column=0, padx=5)
 
     for item in round_stats:
       # Round sats label (Answer | User input)
       # Reference: https://stackoverflow.com/questions/62912728/tkinter-gui-label-from-a-text-file-curly-brackets
-      self.ans_input_label = Label(scrollable_frame,text="".join(round_stats), font="Arial 12 bold", bg="white")
+      self.ans_input_label = Label(scrollable_frame,text="".join(round_stats), font="Cabin 12 bold", bg="white")
       self.ans_input_label.grid(row=4, column=0, padx=5)
 
     # Export dismiss frame
@@ -533,12 +525,12 @@ class QuizStats:
 
     # Export Button
     self.export_button = Button(self.export_dismiss_frame, text="Export",
-                                font="Arial 14 bold", bg="#003366", fg="white", padx=15, command=lambda: self.export(total_questions, correct_num, round_stats))
+                                font="Cabin 14 bold", bg="#003366", fg="white", padx=15, command=lambda: self.export(total_questions, correct_num, round_stats))
     self.export_button.grid(row=6, column=0, padx=5)
 
     # Dismiss button
     self.dismiss_button = Button(self.export_dismiss_frame, text="Dismiss",
-                                  font="Arial 14 bold", bg="#660000", fg="white", padx=15, command=partial(self.close_stats, partner))
+                                  font="Cabin 14 bold", bg="#660000", fg="white", padx=15, command=partial(self.close_stats, partner))
     self.dismiss_button.grid(row=6, column=1, padx=5)
 
   # Bind mousewheel to scroll bar
@@ -580,7 +572,7 @@ class Export:
     # Set up export heading (row 0)
     self.how_heading = Label(self.export_frame,
                               text="Export / Instructions",
-                              font="arial 14 bold", bg=background)
+                              font="Cabin 14 bold", bg=background)
     self.how_heading.grid(row=0)
 
     # Export Instructions (label, row 1)
@@ -601,13 +593,13 @@ class Export:
                                                       "be replaced with "
                                                       "your quiz summary ",
                               justify=LEFT, bg="#ffafaf", fg="maroon",
-                              font="Arial 10 italic", wrap=225, padx=10,
+                              font="Cabin 10 italic", wrap=225, padx=10,
                               pady=10)
     self.export_text.grid(row=2, pady=10)
 
     # Filename Entry Box (row 3)
     self.filename_entry = Entry(self.export_frame, width=20,
-                                font="Arial 14 bold", justify=CENTER)
+                                font="Cabin 14 bold", justify=CENTER)
     self.filename_entry.grid(row=3, pady=10)
 
     # Error Message Labels (initially blank, row 4)
@@ -703,12 +695,12 @@ class Export:
 
     # Export Button
     self.export_button = Button(self.export_dismiss_frame, text="Export",
-                                font="Arial 12 bold")
+                                font="Cabin 12 bold")
     self.export_button.grid(row=0, column=0)
 
     # Dismiss button
     self.dismiss_button = Button(self.export_dismiss_frame, text="Dismiss",
-                                  font="Arial 12 bold",
+                                  font="Cabin 12 bold",
                                   command=partial(self.close_export, partner))
     self.dismiss_button.grid(row=0, column=1)
 
@@ -727,3 +719,16 @@ if __name__ == "__main__":
     root.mainloop()
 
 
+# Make instructions clear
+# Create a big title of the quiz for the start window
+# Clear user input
+# user input is not correct for the image generated (pushed forward by 1)
+# Enable stats button only when question number is greater or equal to 10
+
+# Don't have duplicate images showing
+# Change answer and user input into capital letters
+# Destroy all windows (including quiz stats, learn window, help/rules window) when quit or restart button is pressed
+
+
+# Bind next to <enter>
+# Bind mousewheel to scroll bar
