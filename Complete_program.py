@@ -631,6 +631,8 @@ class Export:
 
       elif letter == " ":
         problem = "(no spaces allowed)"
+        has_error = "yes"
+        break
 
       else:
         problem = ("(no {}'s allowed)".format(letter))
